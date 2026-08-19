@@ -28,6 +28,7 @@ export default function RootLayout({
             <a href="/fixtures" style={{ color: "#e6edf3" }}>Fixtures</a>
             <a href="/submit" style={{ color: "#e6edf3" }}>Submit lineup</a>
             <a href="/matchup" style={{ color: "#e6edf3" }}>My matchup</a>
+            <a href="/admin" style={{ color: "#e6edf3" }}>Admin</a>
           </nav>
           <AuthStatus />
           {children}
