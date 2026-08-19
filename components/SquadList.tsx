@@ -10,7 +10,11 @@ let fplPlayersCache: Record<number, string> | null = null;
 async function getFplPlayerMap(): Promise<Record<number, string>> {
   if (fplPlayersCache) return fplPlayersCache;
   const res = await fetch("/api/fpl-players");
-  const map = await res.json();
+  const players = await res.json();
+  const map: Record<number, string> = {};
+  players.forEach((p: any) => {
+    map[p.id] = p.name;
+  });
   fplPlayersCache = map;
   return map;
 }
