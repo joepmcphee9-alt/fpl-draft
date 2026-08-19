@@ -18,8 +18,8 @@ type Fixture = {
   id: string;
   division: number;
   is_bye: boolean;
-  home_score: number | null;
-  away_score: number | null;
+  home_entry_id: string;
+  away_entry_id: string | null;
   home: { players: { name: string } | null } | null;
   away: { players: { name: string } | null } | null;
 };
@@ -28,7 +28,7 @@ async function getFixtures(gameweek: number): Promise<Fixture[]> {
   const { data, error } = await supabase
     .from("fixtures")
     .select(
-      "id, division, is_bye, home_score, away_score, home:home_entry_id(players(name)), away:away_entry_id(players(name))"
+      "id, division, is_bye, home_entry_id, away_entry_id, home:home_entry_id(players(name)), away:away_entry_id(players(name))"
     )
     .eq("gameweek", gameweek)
     .order("division", { ascending: true });
@@ -44,9 +44,25 @@ async function getFixtures(gameweek: number): Promise<Fixture[]> {
   }));
 }
 
+async function getScores(gameweek: number): Promise<Record<string, number>> {
+  const { data } = await supabase
+    .from("entry_scores")
+    .select("entry_id, points")
+    .eq("gameweek", gameweek);
+
+  const map: Record<string, number> = {};
+  (data ?? []).forEach((row) => {
+    map[row.entry_id] = row.points;
+  });
+  return map;
+}
+
 export default async function FixturesPage() {
   const gameweek = await getCurrentGameweek();
-  const fixtures = await getFixtures(gameweek);
+  const [fixtures, scores] = await Promise.all([
+    getFixtures(gameweek),
+    getScores(gameweek),
+  ]);
   const divisions = [1, 2, 3];
 
   return (
@@ -62,29 +78,33 @@ export default async function FixturesPage() {
               <p style={{ opacity: 0.6 }}>No fixtures loaded for this gameweek.</p>
             ) : (
               <div>
-                {rows.map((f) => (
-                  <div
-                    key={f.id}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      padding: "0.5rem 0",
-                      borderBottom: "1px solid #1c2530",
-                    }}
-                  >
-                    {f.is_bye ? (
-                      <span>{f.home?.players?.name ?? "—"} — Bye</span>
-                    ) : (
-                      <>
-                        <span>{f.home?.players?.name ?? "—"}</span>
-                        <span style={{ opacity: 0.6 }}>
-                          {f.home_score ?? "—"} v {f.away_score ?? "—"}
-                        </span>
-                        <span>{f.away?.players?.name ?? "—"}</span>
-                      </>
-                    )}
-                  </div>
-                ))}
+                {rows.map((f) => {
+                  const homeScore = scores[f.home_entry_id];
+                  const awayScore = f.away_entry_id ? scores[f.away_entry_id] : undefined;
+                  return (
+                    <div
+                      key={f.id}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        padding: "0.5rem 0",
+                        borderBottom: "1px solid #1c2530",
+                      }}
+                    >
+                      {f.is_bye ? (
+                        <span>{f.home?.players?.name ?? "—"} — Bye</span>
+                      ) : (
+                        <>
+                          <span>{f.home?.players?.name ?? "—"}</span>
+                          <span style={{ opacity: 0.6 }}>
+                            {homeScore ?? "—"} v {awayScore ?? "—"}
+                          </span>
+                          <span>{f.away?.players?.name ?? "—"}</span>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </section>
