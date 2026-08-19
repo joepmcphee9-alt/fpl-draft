@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 type LeagueSettings = { current_gameweek: number; deadline: string };
-type SquadPlayer = { id: number; name: string };
+type SquadPlayer = { id: number; name: string; position: string };
 
 const inputStyle = {
   padding: "0.5rem",
@@ -15,9 +15,18 @@ const inputStyle = {
   color: "#e6edf3",
 };
 
-async function getFplPlayerMap(): Promise<Record<number, string>> {
+const POSITION_ORDER = ["GK", "DEF", "MID", "FWD"];
+const MAX_STARTERS = 11;
+const BENCH_SIZE = 7;
+
+async function getFplPlayers(): Promise<Record<number, { name: string; position: string }>> {
   const res = await fetch("/api/fpl-players");
-  return res.json();
+  const players = await res.json();
+  const map: Record<number, { name: string; position: string }> = {};
+  players.forEach((p: any) => {
+    map[p.id] = { name: p.name, position: p.position };
+  });
+  return map;
 }
 
 export default function SubmitPage() {
@@ -26,6 +35,7 @@ export default function SubmitPage() {
   const [entryId, setEntryId] = useState<string | null>(null);
   const [squad, setSquad] = useState<SquadPlayer[]>([]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [benchOrder, setBenchOrder] = useState<(number | null)[]>(Array(BENCH_SIZE).fill(null));
   const [captainId, setCaptainId] = useState<number | null>(null);
   const [viceCaptainId, setViceCaptainId] = useState<number | null>(null);
   const [lastSubmitted, setLastSubmitted] = useState<string | null>(null);
@@ -74,16 +84,23 @@ export default function SubmitPage() {
         .select("fpl_player_id")
         .eq("entry_id", entry.id);
 
-      const nameMap = await getFplPlayerMap();
+      const playerMap = await getFplPlayers();
       const squadList = (squadRows ?? [])
-        .map((r) => ({ id: r.fpl_player_id, name: nameMap[r.fpl_player_id] ?? `Unknown (id ${r.fpl_player_id})` }))
+        .map((r) => {
+          const info = playerMap[r.fpl_player_id];
+          return {
+            id: r.fpl_player_id,
+            name: info?.name ?? `Unknown (id ${r.fpl_player_id})`,
+            position: info?.position ?? "UNK",
+          };
+        })
         .sort((a, b) => a.name.localeCompare(b.name));
       setSquad(squadList);
 
       if (settingsData) {
         const { data: existing } = await supabase
           .from("lineups")
-          .select("submitted_at, starting_xi, captain_id, vice_captain_id")
+          .select("submitted_at, starting_xi, captain_id, vice_captain_id, bench_order")
           .eq("entry_id", entry.id)
           .eq("gameweek", settingsData.current_gameweek)
           .maybeSingle();
@@ -93,6 +110,11 @@ export default function SubmitPage() {
           setSelected(new Set(existing.starting_xi ?? []));
           setCaptainId(existing.captain_id ?? null);
           setViceCaptainId(existing.vice_captain_id ?? null);
+          if (existing.bench_order?.length) {
+            const padded = [...existing.bench_order];
+            while (padded.length < BENCH_SIZE) padded.push(null);
+            setBenchOrder(padded);
+          }
         }
       }
 
@@ -103,16 +125,34 @@ export default function SubmitPage() {
 
   const deadlinePassed = settings ? new Date() > new Date(settings.deadline) : false;
 
-  const togglePlayer = (id: number) => {
+  const gkCount = squad.filter((p) => selected.has(p.id) && p.position === "GK").length;
+
+  const togglePlayer = (player: SquadPlayer) => {
     setSelected((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-        if (captainId === id) setCaptainId(null);
-        if (viceCaptainId === id) setViceCaptainId(null);
+      if (next.has(player.id)) {
+        next.delete(player.id);
+        if (captainId === player.id) setCaptainId(null);
+        if (viceCaptainId === player.id) setViceCaptainId(null);
+        setBenchOrder((b) => b.map((id) => (id === player.id ? null : id)));
       } else {
-        next.add(id);
+        if (next.size >= MAX_STARTERS) return prev; // full
+        if (player.position === "GK" && gkCount >= 1) return prev; // only 1 GK starts
+        next.add(player.id);
+        setBenchOrder((b) => b.map((id) => (id === player.id ? null : id)));
       }
+      return next;
+    });
+  };
+
+  const setBenchSlot = (slotIndex: number, playerId: number | null) => {
+    setBenchOrder((prev) => {
+      const next = [...prev];
+      // clear this player from any other slot first
+      for (let i = 0; i < next.length; i++) {
+        if (next[i] === playerId) next[i] = null;
+      }
+      next[slotIndex] = playerId;
       return next;
     });
   };
@@ -128,6 +168,7 @@ export default function SubmitPage() {
         starting_xi: Array.from(selected),
         captain_id: captainId,
         vice_captain_id: viceCaptainId,
+        bench_order: benchOrder,
         submitted_at: new Date().toISOString(),
       },
       { onConflict: "entry_id,gameweek" }
@@ -173,6 +214,9 @@ export default function SubmitPage() {
   }
 
   const selectedPlayers = squad.filter((p) => selected.has(p.id));
+  const benchEligible = squad.filter((p) => !selected.has(p.id));
+  const benchUsedElsewhere = (slotIndex: number, playerId: number) =>
+    benchOrder.some((id, i) => id === playerId && i !== slotIndex);
 
   return (
     <main>
@@ -190,21 +234,36 @@ export default function SubmitPage() {
       )}
 
       <p style={{ marginTop: "1.5rem", marginBottom: "0.5rem" }}>
-        Tick who's starting ({selected.size} selected):
+        Starting XI ({selected.size} / {MAX_STARTERS} — exactly 1 GK):
       </p>
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem", maxWidth: 400 }}>
-        {squad.map((p) => (
-          <label key={p.id} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <input
-              type="checkbox"
-              checked={selected.has(p.id)}
-              disabled={deadlinePassed}
-              onChange={() => togglePlayer(p.id)}
-            />
-            {p.name}
-          </label>
-        ))}
-      </div>
+
+      {POSITION_ORDER.map((pos) => {
+        const posPlayers = squad.filter((p) => p.position === pos);
+        if (posPlayers.length === 0) return null;
+        return (
+          <div key={pos} style={{ marginBottom: "1rem" }}>
+            <p style={{ opacity: 0.6, fontSize: "0.8rem", marginBottom: "0.3rem" }}>{pos}</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem", maxWidth: 400 }}>
+              {posPlayers.map((p) => {
+                const isChecked = selected.has(p.id);
+                const wouldExceedMax = !isChecked && selected.size >= MAX_STARTERS;
+                const wouldExceedGk = !isChecked && p.position === "GK" && gkCount >= 1;
+                return (
+                  <label key={p.id} style={{ display: "flex", alignItems: "center", gap: "0.5rem", opacity: wouldExceedMax || wouldExceedGk ? 0.4 : 1 }}>
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      disabled={deadlinePassed || wouldExceedMax || wouldExceedGk}
+                      onChange={() => togglePlayer(p)}
+                    />
+                    {p.name}
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
 
       <label style={{ display: "block", marginTop: "1.5rem" }}>Captain</label>
       <select
@@ -233,6 +292,28 @@ export default function SubmitPage() {
             <option key={p.id} value={p.id}>{p.name}</option>
           ))}
       </select>
+
+      <p style={{ marginTop: "2rem", marginBottom: "0.5rem" }}>
+        Bench, in order (1st sub off first):
+      </p>
+      {benchOrder.map((slotValue, i) => (
+        <div key={i} style={{ marginBottom: "0.4rem" }}>
+          <label style={{ marginRight: "0.5rem", opacity: 0.7 }}>{i + 1}.</label>
+          <select
+            value={slotValue ?? ""}
+            disabled={deadlinePassed}
+            onChange={(e) => setBenchSlot(i, e.target.value ? Number(e.target.value) : null)}
+            style={{ ...inputStyle, width: 240 }}
+          >
+            <option value="">— empty —</option>
+            {benchEligible
+              .filter((p) => !benchUsedElsewhere(i, p.id))
+              .map((p) => (
+                <option key={p.id} value={p.id}>{p.name} ({p.position})</option>
+              ))}
+          </select>
+        </div>
+      ))}
 
       <br />
       <button
