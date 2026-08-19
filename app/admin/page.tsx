@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
-// Lightweight UI-only guard for now — not real security.
-// Anyone with the anon key could still write to this table directly until
-// Row Level Security policies are added later.
-const ADMIN_EMAIL = "joepmcphee9@gmail.com";
+// Lightweight UI-only guard — not full security on its own, paired with a
+// matching database policy below.
+const ADMIN_EMAILS = ["joepmcphee9@gmail.com", "dan_cooper910@hotmail.com", "andrewghammache@gmail.com"];
 
 const inputStyle = {
   padding: "0.5rem",
