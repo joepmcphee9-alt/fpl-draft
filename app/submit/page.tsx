@@ -18,6 +18,7 @@ const inputStyle = {
 const POSITION_ORDER = ["GK", "DEF", "MID", "FWD"];
 const MAX_STARTERS = 11;
 const BENCH_SIZE = 7;
+const VALID_FORMATIONS = ["3-4-3", "3-5-2", "4-4-2", "4-3-3", "4-5-1", "5-4-1", "5-3-2", "5-2-3"];
 
 async function getFplPlayers(): Promise<Record<number, { name: string; position: string }>> {
   const res = await fetch("/api/fpl-players");
@@ -126,6 +127,12 @@ export default function SubmitPage() {
   const deadlinePassed = settings ? new Date() > new Date(settings.deadline) : false;
 
   const gkCount = squad.filter((p) => selected.has(p.id) && p.position === "GK").length;
+  const defCount = squad.filter((p) => selected.has(p.id) && p.position === "DEF").length;
+  const midCount = squad.filter((p) => selected.has(p.id) && p.position === "MID").length;
+  const fwdCount = squad.filter((p) => selected.has(p.id) && p.position === "FWD").length;
+  const formationStr = `${defCount}-${midCount}-${fwdCount}`;
+  const isValidFormation =
+    selected.size === MAX_STARTERS && gkCount === 1 && VALID_FORMATIONS.includes(formationStr);
 
   const togglePlayer = (player: SquadPlayer) => {
     setSelected((prev) => {
@@ -236,6 +243,18 @@ export default function SubmitPage() {
       <p style={{ marginTop: "1.5rem", marginBottom: "0.5rem" }}>
         Starting XI ({selected.size} / {MAX_STARTERS} — exactly 1 GK):
       </p>
+      <p style={{ marginBottom: "1rem" }}>
+        Formation: <strong>{defCount}-{midCount}-{fwdCount}</strong>{" "}
+        {selected.size === MAX_STARTERS && gkCount === 1 && (
+          isValidFormation ? (
+            <span style={{ color: "#3fb950" }}>✓ valid</span>
+          ) : (
+            <span style={{ color: "#f85149" }}>
+              ✗ not a valid formation — needs to be one of: {VALID_FORMATIONS.join(", ")}
+            </span>
+          )
+        )}
+      </p>
 
       {POSITION_ORDER.map((pos) => {
         const posPlayers = squad.filter((p) => p.position === pos);
@@ -318,7 +337,7 @@ export default function SubmitPage() {
       <br />
       <button
         onClick={submit}
-        disabled={deadlinePassed || status === "saving" || selected.size === 0}
+        disabled={deadlinePassed || status === "saving" || !isValidFormation}
         style={{
           marginTop: "1.5rem",
           padding: "0.6rem 1.2rem",
