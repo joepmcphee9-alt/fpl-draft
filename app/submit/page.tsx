@@ -21,7 +21,7 @@ export default function SubmitPage() {
   const [lastSubmitted, setLastSubmitted] = useState<string | null>(null);
   const [startingXi, setStartingXi] = useState("");
   const [captainId, setCaptainId] = useState("");
-  const [status, setStatus] = useState
+  const [status, setStatus] = useState<
     "idle" | "saving" | "saved" | "error"
   >("idle");
   const [loading, setLoading] = useState(true);
