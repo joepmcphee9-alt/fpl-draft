@@ -65,7 +65,7 @@ export default function AdminPage() {
     );
   }
 
-  if (email !== ADMIN_EMAIL) {
+  if (!ADMIN_EMAILS.includes(email ?? "")) {
     return (
       <main>
         <h1>Admin</h1>
