@@ -116,6 +116,9 @@ export default function AdminPage() {
       {status === "error" && (
         <p style={{ color: "#f85149" }}>Something went wrong.</p>
       )}
+        <p style={{ marginTop: "2rem" }}>
+        <a href="/admin/submissions" style={{ color: "#58a6ff" }}>View submissions →</a>
+        </p>
     </main>
   );
 }

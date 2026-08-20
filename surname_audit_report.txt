@@ -1,0 +1,51 @@
+Division 1 — LT: currently has Reece James (Chelsea, DEF) — surname "james" also matches: Daniel James (Leeds, MID)
+
+Division 1 — Westy: currently has Harry Wilson (Leeds, MID) — surname "wilson" also matches: Callum Wilson (Brentford, FWD), Ben Wilson (Coventry City, GK)
+
+Division 1 — Martyn: currently has Lisandro Martínez (Man Utd, DEF) — surname "martinez" also matches: Emiliano Martínez Romero (Aston Villa, GK)
+
+Division 1 — Alex: currently has Joe Gomez (Liverpool, DEF) — surname "gomez" also matches: Diego Gómez Amarilla (Brighton, MID)
+
+Division 1 — Alex: currently has Brennan Johnson (Everton, MID) — surname "johnson" also matches: Ben Johnson (Ipswich Town, DEF)
+
+Division 1 — Alex: currently has Lisandro Martínez (Man Utd, DEF) — surname "martinez" also matches: Emiliano Martínez Romero (Aston Villa, GK)
+
+Division 1 — Dan: currently has Cole Palmer (Chelsea, MID) — surname "palmer" also matches: Alex Palmer (Ipswich Town, GK)
+
+Division 1 — Dan: currently has Mamadou Sangaré (Brentford, MID) — surname "sangaré" also matches: Ibrahim Sangaré (Nott'm Forest, MID)
+
+Division 1 — Dan: currently has Josh King (Fulham, MID) — surname "king" also matches: Tom King (Everton, GK)
+
+Division 2 — Rhys: currently has Harry Wilson (Leeds, MID) — surname "wilson" also matches: Callum Wilson (Brentford, FWD), Ben Wilson (Coventry City, GK)
+
+Division 2 — Joe: currently has Diego Gómez Amarilla (Brighton, MID) — surname "gomez" also matches: Joe Gomez (Liverpool, DEF)
+
+Division 2 — Joe: currently has Reece James (Chelsea, DEF) — surname "james" also matches: Daniel James (Leeds, MID)
+
+Division 2 — Stu: currently has Mamadou Sangaré (Brentford, MID) — surname "sangaré" also matches: Ibrahim Sangaré (Nott'm Forest, MID)
+
+Division 2 — Wayne: currently has Cole Palmer (Chelsea, MID) — surname "palmer" also matches: Alex Palmer (Ipswich Town, GK)
+
+Division 2 — Julian: currently has Emiliano Martínez Romero (Aston Villa, GK) — surname "martinez" also matches: Lisandro Martínez (Man Utd, DEF)
+
+Division 2 — George: currently has Dean Henderson (Crystal Palace, GK) — surname "henderson" also matches: Jordan Henderson (Chelsea, MID)
+
+Division 2 — Mags: currently has Brennan Johnson (Everton, MID) — surname "johnson" also matches: Ben Johnson (Ipswich Town, DEF)
+
+Division 3 — Jonno: currently has Josh King (Fulham, MID) — surname "king" also matches: Tom King (Everton, GK)
+
+Division 3 — Dale: currently has Reece James (Chelsea, DEF) — surname "james" also matches: Daniel James (Leeds, MID)
+
+Division 3 — Dale: currently has Lisandro Martínez (Man Utd, DEF) — surname "martinez" also matches: Emiliano Martínez Romero (Aston Villa, GK)
+
+Division 3 — Bill: currently has Mamadou Sangaré (Brentford, MID) — surname "sangaré" also matches: Ibrahim Sangaré (Nott'm Forest, MID)
+
+Division 3 — Toby: currently has Cole Palmer (Chelsea, MID) — surname "palmer" also matches: Alex Palmer (Ipswich Town, GK)
+
+Division 3 — Besh: currently has Harry Wilson (Leeds, MID) — surname "wilson" also matches: Callum Wilson (Brentford, FWD), Ben Wilson (Coventry City, GK)
+
+Division 3 — Besh: currently has Emiliano Martínez Romero (Aston Villa, GK) — surname "martinez" also matches: Lisandro Martínez (Man Utd, DEF)
+
+Division 3 — Curry: currently has Joe Gomez (Liverpool, DEF) — surname "gomez" also matches: Diego Gómez Amarilla (Brighton, MID)
+
+Division 3 — Curry: currently has Brennan Johnson (Everton, MID) — surname "johnson" also matches: Ben Johnson (Ipswich Town, DEF)

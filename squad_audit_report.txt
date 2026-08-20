@@ -1,0 +1,173 @@
+
+=== Division 1 — LT (23 players) ===
+DEF: Reece James (Chelsea), William Saliba (Arsenal), Omar Alderete (Sunderland), Lewis Hall (Newcastle), James Hill (Bournemouth), Michael Svoboda (Brighton), Joško Gvardiol (Man City), Juanlu Sánchez (Bournemouth), James Justin (Leeds)
+MID: Sávio Moreira de Oliveira (Man City), Rayan Cherki (Man City), Iliman Ndiaye (Everton), Enzo Le Fée (Sunderland), Junior Kroupi (Bournemouth), Anton Stach (Leeds), Alex Iwobi (Fulham), Ismaïla Sarr (Crystal Palace), Adam Wharton (Crystal Palace), Rodrigo 'Rodri' Hernandez Cascante (Man City)
+FWD: Emersonn Correia da Silva (Ipswich Town), Rodrigo Muniz Carvalho (Fulham), Chris Wood (Nott'm Forest), Alexander Isak (Liverpool)
+
+=== Division 1 — Westy (23 players) ===
+GK: Caoimhín Kelleher (Brentford)
+DEF: Rúben dos Santos Gato Alves Dias (Man City), Riccardo Calafiori (Arsenal), Luke Shaw (Man Utd), Murillo Costa dos Santos (Nott'm Forest), Levi Samuels Colwill (Chelsea), Joachim Andersen (Fulham), Malo Gusto (Chelsea), Sven Botman (Newcastle)
+MID: Mateus Fernandes (Spurs), Estêvão Almeida de Oliveira Gonçalves (Chelsea), Jack Grealish (Man City), Kevin Schade (Brentford), John McGinn (Aston Villa), Morgan Gibbs-White (Nott'm Forest), Harry Wilson (Leeds), Yankuba Minteh (Brighton), Jack Clarke (Ipswich Town), Yéremy Pino Santos (Crystal Palace)
+FWD: William Osula (Newcastle), Francisco Evanilson de Lima Barbosa (Bournemouth), Gabriel Fernando de Jesus (Arsenal), Kai Havertz (Arsenal)
+
+=== Division 1 — Luke (23 players) ===
+GK: Senne Lammens (Man Utd)
+DEF: Nikola Milenković (Nott'm Forest), Jeremy Jacquet (Liverpool), Cristhian Mosquera (Arsenal), Antonee Robinson (Fulham), Vitalii Mykolenko (Everton), Jarrad Branthwaite (Everton), Leif Davis (Ipswich Town), Marcos Senesi Barón (Spurs), Daniel Ballard (Sunderland)
+MID: Bukayo Saka (Arsenal), Florian Wirtz (Liverpool), Matheus Santos Carneiro da Cunha (Man Utd), Kiernan Dewsbury-Hall (Everton), Moisés Caicedo Corozo (Chelsea), Max Dowman (Arsenal), Jack Hinshelwood (Brighton), Victor Munoz (Liverpool), Gabriel Martinelli Silva (Arsenal)
+FWD: Charalampos Kostoulas (Brighton), Benjamin Sesko (Man Utd), Gonzalo García (Fulham), Haji Wright (Coventry City)
+
+=== Division 1 — Martyn (23 players) ===
+GK: Matz Sels (Nott'm Forest)
+DEF: Virgil van Dijk (Liverpool), Micky van de Ven (Spurs), Tyrick Mitchell (Crystal Palace), Marc Guéhi (Man City), Pascal Struijk (Brighton), Sepp van den Berg (Brentford), Lisandro Martínez (Man Utd), Dan Burn (Newcastle), Adrien Truffert (Bournemouth)
+MID: Pedro Lomba Neto (Chelsea), Alexis Mac Allister (Liverpool), Declan Rice (Arsenal), James Garner (Everton), Jaidon Anthony (Brentford), Alex Scott (Bournemouth), Harvey Barnes (Newcastle), Youri Tielemans (Man Utd), Brenden Aaronson (Leeds)
+FWD: Nick Woltemade (Newcastle), Wilson Isidor (Sunderland), George Hirst (Ipswich Town), Lukas Nmecha (Leeds)
+
+=== Division 1 — Gav (23 players) ===
+GK: David Raya Martín (Arsenal)
+DEF: Piero Hincapié (Arsenal), Ayden Heaven (Man Utd), Issa Diop (Ipswich Town), Trai Hume (Sunderland), Michael Kayode (Brentford), Joe Rodon (Leeds), Milos Kerkez (Liverpool), Harry Maguire (Man Utd)
+MID: Marcus Tavernier (Bournemouth), Mason Mount (Man Utd), Chemsdine Talbi (Sunderland), Eberechi Eze (Arsenal), Pascal Groß (Brighton), Sandro Tonali (Spurs), Andrey Nascimento dos Santos (Man Utd), Elliot Anderson (Man City), Bruno Guimarães Rodriguez Moura (Arsenal)
+FWD: João Pedro Junqueira de Jesus (Chelsea), Igor Thiago Nascimento Rodrigues (Brentford), Omar Marmoush (Man City), Danny Welbeck (Chelsea), Joshua Zirkzee (Man Utd)
+
+=== Division 1 — Alex (23 players) ===
+GK: Gianluigi Donnarumma (Man City)
+DEF: Gabriel dos Santos Magalhães (Arsenal), Marco Palestra (Chelsea), Joe Gomez (Liverpool), Ola Aina (Nott'm Forest), Juanlu Sánchez (Bournemouth), Nordi Mukiele (Sunderland), Matty Cash (Aston Villa), Lisandro Martínez (Man Utd), Tino Livramento (Newcastle), Tarik Muharemović (Leeds)
+MID: Antoine Semenyo (Man City), Cody Gakpo (Liverpool), Christos Tzolis (Arsenal), Johan Manzambi (Aston Villa), Brennan Johnson (Everton), Mikkel Damsgaard (Brentford), Oscar Bobb (Fulham), Victor Munoz (Liverpool), Mitoma Kaoru (Brighton)
+FWD: Álvaro Rodríguez (Bournemouth), Dominic Calvert-Lewin (Leeds), Richarlison de Andrade (Spurs)
+
+=== Division 1 — Mash (23 players) ===
+GK: Jordan Pickford (Everton)
+DEF: Nico O'Reilly (Man City), Ezri Konsa Ngoyo (Aston Villa), Maxim De Cuyper (Brighton), Pedro Porro Sauceda (Spurs), Abdukodir Khusanov (Man City), Ousmane Diomande (Nott'm Forest), Chris Richards (Crystal Palace), Leny Yoro (Man Utd)
+MID: Morgan Rogers (Chelsea), Rayan Vitor Simplício Rocha (Bournemouth), Rio Ngumoha (Liverpool), Martin Ødegaard (Arsenal), Kobbie Mainoo (Man Utd), Mikel Merino Zazón (Arsenal), Dango Ouattara (Brentford), Amad Diallo (Man Utd), Jacob Ramsey (Newcastle), Yasin Ayari (Brighton)
+FWD: Ollie Watkins (Aston Villa), Dominic Solanke-Mitchell (Spurs), Liam Delap (Chelsea), Hugo Ekitiké (Liverpool)
+
+=== Division 1 — Dan (23 players) ===
+GK: Alisson Becker (Liverpool)
+DEF: Jaydee Canvot (Crystal Palace), António João Pereira de Albuquerque Tavares da Silva (Bournemouth), Pau Torres (Aston Villa), Maxence Lacroix (Chelsea), Ian Maatsen (Aston Villa), James Tarkowski (Everton), Benjamin White (Arsenal), Malick Thiaw (Newcastle)
+MID: Justin Kluivert (Bournemouth), Bazoumana Touré (Newcastle), Gustavo Hamer (Coventry City), Cole Palmer (Chelsea), Mamadou Sangaré (Brentford), Phil Foden (Man City), Emiliano Buendía Stati (Aston Villa), Mathys Tel (Spurs), Josh King (Fulham)
+FWD: Georginio Rutter (Brighton), Brian Brobbey (Sunderland), Jean-Philippe Mateta (Crystal Palace), Yoane Wissa (Newcastle), Thierno Barry (Everton)
+
+=== Division 1 — Paul (23 players) ===
+GK: Đorđe Petrović (Bournemouth), Nick Pope (Newcastle)
+DEF: Jurriën Timber (Arsenal), Jeremie Frimpong (Liverpool), Diogo Dalot Teixeira (Man Utd), Calvin Bassey (Fulham), Matheus Nunes (Man City), Andrew Robertson (Spurs)
+MID: Jérémy Doku (Man City), Patrick Dorgu (Man Utd), Mykhailo Mudryk (Chelsea), Bryan Mbeumo (Man Utd), Dominik Szoboszlai (Liverpool), Marcus Rashford (Man Utd), Anthony Elanga (Newcastle), Noni Madueke (Arsenal), Myles Lewis-Skelly (Arsenal), Alejandro Garnacho Ferreyra (Aston Villa), Kevin Santos Lopes de Macedo (Fulham)
+FWD: Jørgen Strand Larsen (Crystal Palace), Nicolas Jackson (Chelsea), Viktor Gyökeres (Arsenal), Norberto Bercique Gomes Betuncal (Everton)
+
+=== Division 1 — Morris (23 players) ===
+GK: Bart Verbruggen (Brighton), Antonín Kinský (Spurs)
+DEF: Jan Paul van Hecke (Spurs), Luka Vušković (Brighton), Ferdi Kadıoğlu (Brighton), Neco Williams (Nott'm Forest), Michael Keane (Everton), Nathan Collins (Brentford), Ryan Sessegnon (Fulham), Ronald Araujo (Liverpool)
+MID: Enzo Fernández (Chelsea), Ryan Gravenberch (Liverpool), Dejan Kulusevski (Spurs), James Maddison (Spurs), Mohammed Kudus (Spurs), Mateus Fernandes (Spurs), Noah Okafor (Leeds), Granit Xhaka (Sunderland), Jamie Bynoe-Gittens (Chelsea), Martín Zubimendi Ibáñez (Arsenal)
+FWD: Erling Haaland (Man City), Oli McBurnie (Hull City), Igor Jesus Maciel da Cruz (Nott'm Forest)
+
+=== Division 2 — Andy (2 players) ===
+DEF: Gabriel dos Santos Magalhães (Arsenal)
+FWD: Viktor Gyökeres (Arsenal)
+
+=== Division 2 — Rhys (23 players) ===
+GK: Gianluigi Donnarumma (Man City)
+DEF: Matheus Nunes (Man City), Piero Hincapié (Arsenal), Levi Samuels Colwill (Chelsea), Michael Kayode (Brentford), Ronald Araujo (Liverpool), Ola Aina (Nott'm Forest), James Hill (Bournemouth), Pascal Struijk (Brighton), António João Pereira de Albuquerque Tavares da Silva (Bournemouth)
+MID: Matheus Santos Carneiro da Cunha (Man Utd), Dominik Szoboszlai (Liverpool), Harry Wilson (Leeds), Marcus Tavernier (Bournemouth), Kevin Schade (Brentford), Marcus Rashford (Man Utd), John McGinn (Aston Villa), Mikkel Damsgaard (Brentford), Noah Okafor (Leeds), Victor Munoz (Liverpool)
+FWD: Erling Haaland (Man City), Danny Welbeck (Chelsea), George Hirst (Ipswich Town)
+
+=== Division 2 — Joe (23 players) ===
+GK: David Raya Martín (Arsenal)
+DEF: Adrien Truffert (Bournemouth), Ezri Konsa Ngoyo (Aston Villa), Ousmane Diomande (Nott'm Forest), Reece James (Chelsea), Benjamin White (Arsenal), Luka Vušković (Brighton), Joe Gomez (Liverpool), Thomas Meunier (Sunderland), Jake O'Brien (Everton), Jeremy Jacquet (Liverpool)
+MID: Phil Foden (Man City), Declan Rice (Arsenal), Rayan Vitor Simplício Rocha (Bournemouth), James Maddison (Spurs), Harvey Barnes (Newcastle), Joao Gomes (Aston Villa), Mikel Merino Zazón (Arsenal), Max Dowman (Arsenal)
+FWD: João Pedro Junqueira de Jesus (Chelsea), Jean-Philippe Mateta (Crystal Palace), Kai Havertz (Arsenal), Nick Woltemade (Newcastle)
+
+=== Division 2 — Stu (23 players) ===
+GK: Alisson Becker (Liverpool), Caoimhín Kelleher (Brentford)
+DEF: Virgil van Dijk (Liverpool), William Saliba (Arsenal), Jeremie Frimpong (Liverpool), Nordi Mukiele (Sunderland), Lewis Hall (Newcastle), Cristhian Mosquera (Arsenal)
+MID: Morgan Rogers (Chelsea), Pascal Groß (Brighton), Alex Scott (Bournemouth), Mamadou Sangaré (Brentford), Anton Stach (Leeds), Gustavo Hamer (Coventry City), Mykhailo Mudryk (Chelsea), Shea Charles (Fulham), Dejan Kulusevski (Spurs), Noni Madueke (Arsenal), Jack Grealish (Man City)
+FWD: Alexander Isak (Liverpool), Francisco Evanilson de Lima Barbosa (Bournemouth), Brian Brobbey (Sunderland), Brian Madjo (Aston Villa)
+
+=== Division 2 — Jumby (23 players) ===
+DEF: Rúben dos Santos Gato Alves Dias (Man City), Jan Paul van Hecke (Spurs), Milos Kerkez (Liverpool), Matty Cash (Aston Villa), Antonee Robinson (Fulham), Nikola Milenković (Nott'm Forest), Juanlu Sánchez (Bournemouth), Tino Livramento (Newcastle), Destiny Udogie (Spurs), Kristoffer Ajer (Brentford)
+MID: Bruno Borges Fernandes (Man Utd), Rayan Cherki (Man City), Enzo Fernández (Chelsea), Pedro Lomba Neto (Chelsea), Mateus Fernandes (Spurs), Mohammed Kudus (Spurs), Sávio Moreira de Oliveira (Man City), Xavi Simons (Spurs), Adam Wharton (Crystal Palace)
+FWD: Dominic Solanke-Mitchell (Spurs), Thierno Barry (Everton), Richarlison de Andrade (Spurs), Omar Marmoush (Man City)
+
+=== Division 2 — Wayne (23 players) ===
+GK: Jordan Pickford (Everton)
+DEF: Pedro Porro Sauceda (Spurs), Riccardo Calafiori (Arsenal), Malick Thiaw (Newcastle), Tyrick Mitchell (Crystal Palace), Vitalii Mykolenko (Everton), Sepp van den Berg (Brentford), Milan van Ewijk (Coventry City)
+MID: Cole Palmer (Chelsea), Florian Wirtz (Liverpool), Eberechi Eze (Arsenal), Iliman Ndiaye (Everton), Dango Ouattara (Brentford), Junior Kroupi (Bournemouth), Oscar Bobb (Fulham), Carlos Baleba (Brighton), Abdul Fatawu (Ipswich Town), Xaver Schlager (Nott'm Forest), Bazoumana Touré (Newcastle)
+FWD: Dominic Calvert-Lewin (Leeds), Arnaud Kalimuendo (Nott'm Forest), Jørgen Strand Larsen (Crystal Palace), Liam Delap (Chelsea)
+
+=== Division 2 — Julian (23 players) ===
+DEF: Nico O'Reilly (Man City), Andrew Robertson (Spurs), Diogo Dalot Teixeira (Man Utd), Lisandro Martínez (Man Utd), Maxim De Cuyper (Brighton), Chris Richards (Crystal Palace), Pep Chavarría (Chelsea), Ryan Sessegnon (Fulham)
+MID: Bryan Mbeumo (Man Utd), Jérémy Doku (Man City), Victor Munoz (Liverpool), Martin Ødegaard (Arsenal), Rio Ngumoha (Liverpool), Granit Xhaka (Sunderland), Alexis Mac Allister (Liverpool), Jaidon Anthony (Brentford), Alex Iwobi (Fulham), Myles Lewis-Skelly (Arsenal), Alejandro Garnacho Ferreyra (Aston Villa)
+FWD: Ollie Watkins (Aston Villa), William Osula (Newcastle), Chris Wood (Nott'm Forest), Wilson Isidor (Sunderland)
+
+=== Division 2 — George (23 players) ===
+GK: Dean Henderson (Crystal Palace), Bart Verbruggen (Brighton)
+DEF: Micky van de Ven (Spurs), Neco Williams (Nott'm Forest), Nathan Collins (Brentford), Juanlu Sánchez (Bournemouth), Jurriën Timber (Arsenal), Jarrad Branthwaite (Everton), Marco Palestra (Chelsea), Calvin Bassey (Fulham)
+MID: Bukayo Saka (Arsenal), Elliot Anderson (Man City), Ismaïla Sarr (Crystal Palace), James Garner (Everton), Justin Kluivert (Bournemouth), Sandro Tonali (Spurs), Yankuba Minteh (Brighton), Ethan Ampadu (Leeds)
+FWD: Benjamin Sesko (Man Utd), Igor Jesus Maciel da Cruz (Nott'm Forest), Emersonn Correia da Silva (Ipswich Town), Oli McBurnie (Hull City), Norberto Bercique Gomes Betuncal (Everton)
+
+=== Division 2 — Mags (23 players) ===
+GK: Senne Lammens (Man Utd), Nick Pope (Newcastle)
+DEF: Marc Guéhi (Man City), Ferdi Kadıoğlu (Brighton), Marcos Senesi Barón (Spurs), Rayan Aït-Nouri (Man City), Daniel Ballard (Sunderland), Murillo Costa dos Santos (Nott'm Forest), Sven Botman (Newcastle)
+MID: Antoine Semenyo (Man City), Bruno Guimarães Rodriguez Moura (Arsenal), Cody Gakpo (Liverpool), Youri Tielemans (Man Utd), Johan Manzambi (Aston Villa), Amad Diallo (Man Utd), Callum Hudson-Odoi (Nott'm Forest), Brennan Johnson (Everton), Mitoma Kaoru (Brighton), Conor Gallagher (Spurs)
+FWD: Hugo Ekitiké (Liverpool), Georginio Rutter (Brighton), Haji Wright (Coventry City), Rodrigo Muniz Carvalho (Fulham)
+
+=== Division 2 — Adam (23 players) ===
+GK: Antonín Kinský (Spurs), Đorđe Petrović (Bournemouth)
+DEF: Maxence Lacroix (Chelsea), James Tarkowski (Everton), Joško Gvardiol (Man City), Ian Maatsen (Aston Villa), Harry Maguire (Man Utd), Jaydee Canvot (Crystal Palace), Joe Rodon (Leeds)
+MID: Morgan Gibbs-White (Nott'm Forest), Kiernan Dewsbury-Hall (Everton), Christos Tzolis (Arsenal), Emiliano Buendía Stati (Aston Villa), Mathys Tel (Spurs), Enzo Le Fée (Sunderland), Ryan Gravenberch (Liverpool), Kevin Santos Lopes de Macedo (Fulham), Moisés Caicedo Corozo (Chelsea)
+FWD: Igor Thiago Nascimento Rodrigues (Brentford), Gonzalo García (Fulham), Yoane Wissa (Newcastle), Charalampos Kostoulas (Brighton), Nicolas Jackson (Chelsea)
+
+=== Division 3 — Jonno (23 players) ===
+GK: David Raya Martín (Arsenal)
+DEF: Riccardo Calafiori (Arsenal), James Tarkowski (Everton), Jeremy Jacquet (Liverpool), Nikola Milenković (Nott'm Forest), Levi Samuels Colwill (Chelsea), Benjamin White (Arsenal), Pascal Struijk (Brighton), Nathan Collins (Brentford), Chris Richards (Crystal Palace)
+MID: Jérémy Doku (Man City), Cody Gakpo (Liverpool), Harvey Barnes (Newcastle), Johan Manzambi (Aston Villa), Yasin Ayari (Brighton), Jaidon Anthony (Brentford), Josh King (Fulham), Gabriel Martinelli Silva (Arsenal), Zadok Yohanna (Brighton), Keane Lewis-Potter (Brentford)
+FWD: Alexander Isak (Liverpool), Georginio Rutter (Brighton), Chuba Akpom (Ipswich Town)
+
+=== Division 3 — Dave (23 players) ===
+GK: Alisson Becker (Liverpool)
+DEF: Marcos Senesi Barón (Spurs), Tyrick Mitchell (Crystal Palace), Luke Shaw (Man Utd), Matty Cash (Aston Villa)
+MID: Bruno Borges Fernandes (Man Utd), Rayan Cherki (Man City), Enzo Fernández (Chelsea), Victor Munoz (Liverpool), Anton Stach (Leeds), James Garner (Everton), Enzo Le Fée (Sunderland), Ryan Gravenberch (Liverpool), Dan Ndoye (Nott'm Forest), Noah Okafor (Leeds), Noni Madueke (Arsenal), Tijjani Reijnders (Man City), Merlin Röhl (Everton), Jamie Bynoe-Gittens (Chelsea), Brenden Aaronson (Leeds)
+FWD: Dominic Calvert-Lewin (Leeds), Richarlison de Andrade (Spurs), Ellis Simms (Coventry City)
+
+=== Division 3 — Greg (23 players) ===
+GK: Senne Lammens (Man Utd)
+DEF: Nico O'Reilly (Man City), Jan Paul van Hecke (Spurs), Neco Williams (Nott'm Forest), Diogo Dalot Teixeira (Man Utd), Harry Maguire (Man Utd)
+MID: Shea Lacey (Man Utd), Florian Wirtz (Liverpool), Rayan Vitor Simplício Rocha (Bournemouth), Dango Ouattara (Brentford), Amad Diallo (Man Utd), Joao Gomes (Aston Villa), Oscar Bobb (Fulham), Kobbie Mainoo (Man Utd), Alejandro Garnacho Ferreyra (Aston Villa), Myles Lewis-Skelly (Arsenal), Hayden Hackney (Everton), Andrey Nascimento dos Santos (Man Utd), Jack Grealish (Man City), Kevin Santos Lopes de Macedo (Fulham)
+FWD: João Pedro Junqueira de Jesus (Chelsea), Brian Brobbey (Sunderland), William Osula (Newcastle)
+
+=== Division 3 — Henry (23 players) ===
+GK: Jordan Pickford (Everton)
+DEF: Matheus Nunes (Man City), Pedro Porro Sauceda (Spurs), Ferdi Kadıoğlu (Brighton), Ousmane Diomande (Nott'm Forest), Malick Thiaw (Newcastle), Tarik Muharemović (Leeds), Michael Kayode (Brentford), Jaydee Canvot (Crystal Palace), Omar Alderete (Sunderland)
+MID: Morgan Rogers (Chelsea), Morgan Gibbs-White (Nott'm Forest), Phil Foden (Man City), Ismaïla Sarr (Crystal Palace), Sávio Moreira de Oliveira (Man City), Christos Tzolis (Arsenal), Gustavo Hamer (Coventry City), Mathys Tel (Spurs), Dwight McNeil (Crystal Palace)
+FWD: Francisco Evanilson de Lima Barbosa (Bournemouth), Gonzalo García (Fulham), Nick Woltemade (Newcastle), Oli McBurnie (Hull City)
+
+=== Division 3 — Dale (23 players) ===
+DEF: Gabriel dos Santos Magalhães (Arsenal), Juanlu Sánchez (Bournemouth), Luka Vušković (Brighton), Reece James (Chelsea), Lisandro Martínez (Man Utd), Ezri Konsa Ngoyo (Aston Villa), Jarrad Branthwaite (Everton), Jake O'Brien (Everton), Pau Torres (Aston Villa), Destiny Udogie (Spurs)
+MID: Dominik Szoboszlai (Liverpool), Iliman Ndiaye (Everton), Patrick Dorgu (Man Utd), Kevin Schade (Brentford), Estêvão Almeida de Oliveira Gonçalves (Chelsea), Jack Hinshelwood (Brighton), Mikel Merino Zazón (Arsenal), Mikkel Damsgaard (Brentford), Victor Munoz (Liverpool)
+FWD: Benjamin Sesko (Man Utd), Thierno Barry (Everton), Danny Welbeck (Chelsea), Lukas Nmecha (Leeds)
+
+=== Division 3 — Bill (23 players) ===
+GK: Gianluigi Donnarumma (Man City)
+DEF: Piero Hincapié (Arsenal), Abdukodir Khusanov (Man City), Cristhian Mosquera (Arsenal), Antonee Robinson (Fulham), Ayden Heaven (Man Utd), Jorrel Hato (Chelsea), Trai Hume (Sunderland), Ian Maatsen (Aston Villa), William Saliba (Arsenal)
+MID: Matheus Santos Carneiro da Cunha (Man Utd), Elliot Anderson (Man City), Mateus Fernandes (Spurs), Justin Kluivert (Bournemouth), Alex Iwobi (Fulham), Mamadou Sangaré (Brentford), Moisés Caicedo Corozo (Chelsea), Granit Xhaka (Sunderland), Martín Zubimendi Ibáñez (Arsenal)
+FWD: Viktor Gyökeres (Arsenal), Yoane Wissa (Newcastle), Jørgen Strand Larsen (Crystal Palace), Nicolas Jackson (Chelsea)
+
+=== Division 3 — Shaun (23 players) ===
+GK: Matz Sels (Nott'm Forest)
+DEF: Micky van de Ven (Spurs), Lewis Hall (Newcastle), Maxim De Cuyper (Brighton), Nordi Mukiele (Sunderland), James Hill (Bournemouth), Murillo Costa dos Santos (Nott'm Forest), Wesley Fofana (Chelsea)
+MID: Antoine Semenyo (Man City), Bryan Mbeumo (Man Utd), Declan Rice (Arsenal), Martin Ødegaard (Arsenal), Junior Kroupi (Bournemouth), Youri Tielemans (Man Utd), James Maddison (Spurs), Christian Nørgaard (Everton), Mitoma Kaoru (Brighton), Yéremy Pino Santos (Crystal Palace)
+FWD: Dominic Solanke-Mitchell (Spurs), Jean-Philippe Mateta (Crystal Palace), Norberto Bercique Gomes Betuncal (Everton), Charalampos Kostoulas (Brighton), Álvaro Rodríguez (Bournemouth)
+
+=== Division 3 — Toby (23 players) ===
+GK: Đorđe Petrović (Bournemouth)
+DEF: Joško Gvardiol (Man City), Ronald Araujo (Liverpool), Andrew Robertson (Spurs), Jeremie Frimpong (Liverpool), Tino Livramento (Newcastle), Olivier Boscagli (Brighton)
+MID: Cole Palmer (Chelsea), Bukayo Saka (Arsenal), Rio Ngumoha (Liverpool), Marcus Rashford (Man Utd), Eberechi Eze (Arsenal), Trey Nyoni (Liverpool), Jacob Murphy (Newcastle), Max Dowman (Arsenal), Conor Gallagher (Spurs), Emile Smith Rowe (Fulham), Tyler Dibling (Everton)
+FWD: Kai Havertz (Arsenal), Omar Marmoush (Man City), Brian Madjo (Aston Villa), Emersonn Correia da Silva (Ipswich Town), Haji Wright (Coventry City)
+
+=== Division 3 — Besh (23 players) ===
+DEF: Marc Guéhi (Man City), Maxence Lacroix (Chelsea), Adrien Truffert (Bournemouth), Rúben dos Santos Gato Alves Dias (Man City), Jurriën Timber (Arsenal), Michael Keane (Everton), Lisandro Martínez (Man Utd), Daniel Ballard (Sunderland), Jaka Bijol (Leeds), Dan Burn (Newcastle)
+MID: Bruno Guimarães Rodriguez Moura (Arsenal), Kiernan Dewsbury-Hall (Everton), Harry Wilson (Leeds), Pascal Groß (Brighton), Pedro Lomba Neto (Chelsea), Marcus Tavernier (Bournemouth), John McGinn (Aston Villa), Ethan Ampadu (Leeds), Anthony Elanga (Newcastle), Joelinton Cássio Apolinário de Lira (Newcastle)
+FWD: Igor Thiago Nascimento Rodrigues (Brentford), Ollie Watkins (Aston Villa), Hugo Ekitiké (Liverpool)
+
+=== Division 3 — Curry (23 players) ===
+GK: Antonín Kinský (Spurs)
+DEF: Virgil van Dijk (Liverpool), Marco Palestra (Chelsea), Milos Kerkez (Liverpool), Ola Aina (Nott'm Forest), Joe Gomez (Liverpool), António João Pereira de Albuquerque Tavares da Silva (Bournemouth), Pep Chavarría (Chelsea)
+MID: Sandro Tonali (Spurs), Alex Scott (Bournemouth), Yankuba Minteh (Brighton), Emiliano Buendía Stati (Aston Villa), Alexis Mac Allister (Liverpool), Mohammed Kudus (Spurs), Adam Wharton (Crystal Palace), Bazoumana Touré (Newcastle), Mykhailo Mudryk (Chelsea), Brennan Johnson (Everton)
+FWD: Erling Haaland (Man City), Igor Jesus Maciel da Cruz (Nott'm Forest), Liam Delap (Chelsea), Chris Wood (Nott'm Forest), Taiwo Awoniyi (Coventry City)
