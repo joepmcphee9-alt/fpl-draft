@@ -2,47 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import MatchupView from "@/components/MatchupView";
 
-type PlayerLookup = Record<number, { name: string; position: string }>;
-
-async function getFplPlayers(): Promise<PlayerLookup> {
-  const res = await fetch("/api/fpl-players");
-  const players = await res.json();
-  const map: PlayerLookup = {};
-  players.forEach((p: any) => {
-    map[p.id] = { name: p.name, position: p.position };
-  });
-  return map;
-}
-
-const POSITION_ORDER = ["GK", "DEF", "MID", "FWD"];
-
-const sortByPosition = (ids: number[], playerMap: PlayerLookup) =>
-  [...ids].sort((a, b) => {
-    const posA = POSITION_ORDER.indexOf(playerMap[a]?.position ?? "");
-    const posB = POSITION_ORDER.indexOf(playerMap[b]?.position ?? "");
-    return posA - posB;
-  });
-
-type Side = {
-  entryId: string;
-  managerName: string;
-  score: number | null;
-  startingXi: number[];
-  captainId: number | null;
-  viceCaptainId: number | null;
-  benchOrder: (number | null)[];
-};
-
-export default function MatchupPage() {
+export default function MyMatchupPage() {
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState<string | null>(null);
-  const [gameweek, setGameweek] = useState<number | null>(null);
-  const [playerMap, setPlayerMap] = useState<PlayerLookup>({});
-  const [me, setMe] = useState<Side | null>(null);
-  const [opponent, setOpponent] = useState<Side | null>(null);
-  const [isBye, setIsBye] = useState(false);
+  const [fixtureId, setFixtureId] = useState<string | null>(null);
   const [noFixture, setNoFixture] = useState(false);
+  const [gameweek, setGameweek] = useState<number | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -73,7 +40,7 @@ export default function MatchupPage() {
 
       const { data: entry } = await supabase
         .from("entries")
-        .select("id, players(name)")
+        .select("id")
         .eq("player_id", player.id)
         .maybeSingle();
       if (!entry) {
@@ -83,79 +50,16 @@ export default function MatchupPage() {
 
       const { data: fixture } = await supabase
         .from("fixtures")
-        .select("home_entry_id, away_entry_id, is_bye")
+        .select("id")
         .eq("gameweek", gw)
         .or(`home_entry_id.eq.${entry.id},away_entry_id.eq.${entry.id}`)
         .maybeSingle();
 
       if (!fixture) {
         setNoFixture(true);
-        setLoading(false);
-        return;
+      } else {
+        setFixtureId(fixture.id);
       }
-
-      if (fixture.is_bye) {
-        setIsBye(true);
-        setLoading(false);
-        return;
-      }
-
-      const opponentEntryId =
-        fixture.home_entry_id === entry.id ? fixture.away_entry_id : fixture.home_entry_id;
-
-      const [myLineup, oppLineup, myEntryInfo, oppEntryInfo, scores, players] = await Promise.all([
-        supabase
-          .from("lineups")
-          .select("starting_xi, captain_id, vice_captain_id, bench_order")
-          .eq("entry_id", entry.id)
-          .eq("gameweek", gw)
-          .maybeSingle(),
-        opponentEntryId
-          ? supabase
-              .from("lineups")
-              .select("starting_xi, captain_id, vice_captain_id, bench_order")
-              .eq("entry_id", opponentEntryId)
-              .eq("gameweek", gw)
-              .maybeSingle()
-          : Promise.resolve({ data: null }),
-        Promise.resolve({ data: entry }),
-        opponentEntryId
-          ? supabase.from("entries").select("id, players(name)").eq("id", opponentEntryId).maybeSingle()
-          : Promise.resolve({ data: null }),
-        supabase.from("entry_scores").select("entry_id, points").eq("gameweek", gw),
-        getFplPlayers(),
-      ]);
-
-      setPlayerMap(players);
-
-      const scoreMap: Record<string, number> = {};
-      (scores.data ?? []).forEach((r: any) => (scoreMap[r.entry_id] = r.points));
-
-      const myName = (myEntryInfo.data as any)?.players?.name ?? "You";
-      const oppName = (oppEntryInfo.data as any)?.players?.name ?? "Opponent";
-
-      setMe({
-        entryId: entry.id,
-        managerName: myName,
-        score: scoreMap[entry.id] ?? null,
-        startingXi: myLineup.data?.starting_xi ?? [],
-        captainId: myLineup.data?.captain_id ?? null,
-        viceCaptainId: myLineup.data?.vice_captain_id ?? null,
-        benchOrder: myLineup.data?.bench_order ?? [],
-      });
-
-      if (opponentEntryId) {
-        setOpponent({
-          entryId: opponentEntryId,
-          managerName: oppName,
-          score: scoreMap[opponentEntryId] ?? null,
-          startingXi: oppLineup.data?.starting_xi ?? [],
-          captainId: oppLineup.data?.captain_id ?? null,
-          viceCaptainId: oppLineup.data?.vice_captain_id ?? null,
-          benchOrder: oppLineup.data?.bench_order ?? [],
-        });
-      }
-
       setLoading(false);
     };
     load();
@@ -173,7 +77,7 @@ export default function MatchupPage() {
     );
   }
 
-  if (noFixture) {
+  if (noFixture || !fixtureId) {
     return (
       <main>
         <h1>My matchup</h1>
@@ -182,59 +86,13 @@ export default function MatchupPage() {
     );
   }
 
-  if (isBye) {
-    return (
-      <main>
-        <h1>My matchup — Gameweek {gameweek}</h1>
-        <p style={{ opacity: 0.7 }}>You've got a bye this week.</p>
-      </main>
-    );
-  }
-
-  const renderSide = (side: Side | null) => {
-    if (!side) return <p style={{ opacity: 0.6 }}>No data</p>;
-    return (
-      <div style={{ flex: 1 }}>
-        <h3>{side.managerName}</h3>
-        <p style={{ fontSize: "1.8rem", margin: "0.3rem 0" }}>{side.score ?? "—"}</p>
-        {side.startingXi.length === 0 ? (
-          <p style={{ opacity: 0.6, fontSize: "0.9rem" }}>No lineup submitted yet</p>
-        ) : (
-          <>
-            <div style={{ fontSize: "0.9rem", opacity: 0.85 }}>
-              {sortByPosition(side.startingXi, playerMap).map((id) => {
-                const info = playerMap[id];
-                const tag = id === side.captainId ? " (C)" : id === side.viceCaptainId ? " (VC)" : "";
-                return <div key={id}>{info?.name ?? `id ${id}`}{tag}</div>;
-              })}
-            </div>
-            {side.benchOrder.some((id) => id !== null) && (
-              <>
-                <p style={{ marginTop: "1rem", marginBottom: "0.3rem", fontSize: "0.8rem", opacity: 0.6 }}>
-                  Bench
-                </p>
-                <div style={{ fontSize: "0.85rem", opacity: 0.7 }}>
-                  {side.benchOrder.map((id, i) =>
-                    id ? (
-                      <div key={i}>{i + 1}. {playerMap[id]?.name ?? `id ${id}`}</div>
-                    ) : null
-                  )}
-                </div>
-              </>
-            )}
-          </>
-        )}
-      </div>
-    );
-  };
-
   return (
     <main>
       <h1>My matchup — Gameweek {gameweek}</h1>
-      <div style={{ display: "flex", gap: "2rem", marginTop: "1.5rem" }}>
-        {renderSide(me)}
-        {renderSide(opponent)}
-      </div>
+      <p style={{ marginBottom: "1.5rem" }}>
+        <a href="/fixtures" style={{ color: "#58a6ff" }}>See all this gameweek's matches →</a>
+      </p>
+      <MatchupView fixtureId={fixtureId} />
     </main>
   );
 }

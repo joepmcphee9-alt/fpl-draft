@@ -57,17 +57,34 @@ async function getScores(gameweek: number): Promise<Record<string, number>> {
   return map;
 }
 
-export default async function FixturesPage() {
-  const gameweek = await getCurrentGameweek();
+export default async function FixturesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ gw?: string }>;
+}) {
+  const params = await searchParams;
+  const currentGameweek = await getCurrentGameweek();
+  const gameweek = params.gw ? parseInt(params.gw, 10) : currentGameweek;
+
   const [fixtures, scores] = await Promise.all([
     getFixtures(gameweek),
     getScores(gameweek),
   ]);
   const divisions = [1, 2, 3];
 
+  const navLinkStyle = { color: "#58a6ff", padding: "0.3rem 0.6rem" };
+
   return (
     <main>
-      <h1>Fixtures — Gameweek {gameweek}</h1>
+      <h1>Fixtures & Results</h1>
+      <div style={{ display: "flex", alignItems: "center", gap: "1rem", margin: "1rem 0" }}>
+        <a href={`/fixtures?gw=${gameweek - 1}`} style={navLinkStyle}>← GW{gameweek - 1}</a>
+        <strong>Gameweek {gameweek}</strong>
+        <a href={`/fixtures?gw=${gameweek + 1}`} style={navLinkStyle}>GW{gameweek + 1} →</a>
+        {gameweek !== currentGameweek && (
+          <a href="/fixtures" style={{ ...navLinkStyle, opacity: 0.7 }}>(back to current)</a>
+        )}
+      </div>
 
       {divisions.map((div) => {
         const rows = fixtures.filter((f) => f.division === div);
@@ -81,9 +98,8 @@ export default async function FixturesPage() {
                 {rows.map((f) => {
                   const homeScore = scores[f.home_entry_id];
                   const awayScore = f.away_entry_id ? scores[f.away_entry_id] : undefined;
-                  return (
+                  const content = (
                     <div
-                      key={f.id}
                       style={{
                         display: "flex",
                         justifyContent: "space-between",
@@ -103,6 +119,13 @@ export default async function FixturesPage() {
                         </>
                       )}
                     </div>
+                  );
+                  return f.is_bye ? (
+                    <div key={f.id}>{content}</div>
+                  ) : (
+                    <a key={f.id} href={`/matchup/${f.id}`} style={{ textDecoration: "none", color: "inherit", display: "block" }}>
+                      {content}
+                    </a>
                   );
                 })}
               </div>
