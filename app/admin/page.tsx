@@ -37,7 +37,13 @@ export default function AdminPage() {
 
       if (settings) {
         setGameweek(String(settings.current_gameweek));
-        setDeadline(new Date(settings.deadline).toISOString().slice(0, 16));
+        // Build the datetime-local value from LOCAL time components, not
+        // toISOString() (which is always UTC and was showing an hour early
+        // during British Summer Time).
+        const d = new Date(settings.deadline);
+        const pad = (n: number) => String(n).padStart(2, "0");
+        const localValue = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        setDeadline(localValue);
       }
       setLoading(false);
     };
