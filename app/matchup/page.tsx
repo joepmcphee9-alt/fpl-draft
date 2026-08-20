@@ -15,6 +15,15 @@ async function getFplPlayers(): Promise<PlayerLookup> {
   return map;
 }
 
+const POSITION_ORDER = ["GK", "DEF", "MID", "FWD"];
+
+const sortByPosition = (ids: number[], playerMap: PlayerLookup) =>
+  [...ids].sort((a, b) => {
+    const posA = POSITION_ORDER.indexOf(playerMap[a]?.position ?? "");
+    const posB = POSITION_ORDER.indexOf(playerMap[b]?.position ?? "");
+    return posA - posB;
+  });
+
 type Side = {
   entryId: string;
   managerName: string;
@@ -22,6 +31,7 @@ type Side = {
   startingXi: number[];
   captainId: number | null;
   viceCaptainId: number | null;
+  benchOrder: (number | null)[];
 };
 
 export default function MatchupPage() {
@@ -96,14 +106,14 @@ export default function MatchupPage() {
       const [myLineup, oppLineup, myEntryInfo, oppEntryInfo, scores, players] = await Promise.all([
         supabase
           .from("lineups")
-          .select("starting_xi, captain_id, vice_captain_id")
+          .select("starting_xi, captain_id, vice_captain_id, bench_order")
           .eq("entry_id", entry.id)
           .eq("gameweek", gw)
           .maybeSingle(),
         opponentEntryId
           ? supabase
               .from("lineups")
-              .select("starting_xi, captain_id, vice_captain_id")
+              .select("starting_xi, captain_id, vice_captain_id, bench_order")
               .eq("entry_id", opponentEntryId)
               .eq("gameweek", gw)
               .maybeSingle()
@@ -131,6 +141,7 @@ export default function MatchupPage() {
         startingXi: myLineup.data?.starting_xi ?? [],
         captainId: myLineup.data?.captain_id ?? null,
         viceCaptainId: myLineup.data?.vice_captain_id ?? null,
+        benchOrder: myLineup.data?.bench_order ?? [],
       });
 
       if (opponentEntryId) {
@@ -141,6 +152,7 @@ export default function MatchupPage() {
           startingXi: oppLineup.data?.starting_xi ?? [],
           captainId: oppLineup.data?.captain_id ?? null,
           viceCaptainId: oppLineup.data?.vice_captain_id ?? null,
+          benchOrder: oppLineup.data?.bench_order ?? [],
         });
       }
 
@@ -188,13 +200,29 @@ export default function MatchupPage() {
         {side.startingXi.length === 0 ? (
           <p style={{ opacity: 0.6, fontSize: "0.9rem" }}>No lineup submitted yet</p>
         ) : (
-          <div style={{ fontSize: "0.9rem", opacity: 0.85 }}>
-            {side.startingXi.map((id) => {
-              const info = playerMap[id];
-              const tag = id === side.captainId ? " (C)" : id === side.viceCaptainId ? " (VC)" : "";
-              return <div key={id}>{info?.name ?? `id ${id}`}{tag}</div>;
-            })}
-          </div>
+          <>
+            <div style={{ fontSize: "0.9rem", opacity: 0.85 }}>
+              {sortByPosition(side.startingXi, playerMap).map((id) => {
+                const info = playerMap[id];
+                const tag = id === side.captainId ? " (C)" : id === side.viceCaptainId ? " (VC)" : "";
+                return <div key={id}>{info?.name ?? `id ${id}`}{tag}</div>;
+              })}
+            </div>
+            {side.benchOrder.some((id) => id !== null) && (
+              <>
+                <p style={{ marginTop: "1rem", marginBottom: "0.3rem", fontSize: "0.8rem", opacity: 0.6 }}>
+                  Bench
+                </p>
+                <div style={{ fontSize: "0.85rem", opacity: 0.7 }}>
+                  {side.benchOrder.map((id, i) =>
+                    id ? (
+                      <div key={i}>{i + 1}. {playerMap[id]?.name ?? `id ${id}`}</div>
+                    ) : null
+                  )}
+                </div>
+              </>
+            )}
+          </>
         )}
       </div>
     );
