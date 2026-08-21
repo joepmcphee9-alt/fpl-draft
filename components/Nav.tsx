@@ -8,8 +8,8 @@ const links = [
   { href: "/submit", label: "Submit lineup" },
   { href: "/matchup", label: "My matchup" },
   { href: "/mom", label: "Manager of the Month" },
-  { href: "/michu-cup", label: "Michu Cup" },
   { href: "/draft-history", label: "Draft History" },
+  { href: "/michu-cup", label: "Michu Cup" },
   { href: "/admin", label: "Admin" },
 ];
 
