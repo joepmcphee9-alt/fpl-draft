@@ -49,6 +49,7 @@ export default function Nav() {
           }}
         >
           {links.map((link) => (
+            <a
             
               key={link.href}
               href={link.href}
