@@ -26,7 +26,6 @@ export default function RootLayout({
       >
         <div style={{ maxWidth: 720, margin: "0 auto" }}>
           <Nav />
-          </nav>
           <AuthStatus />
           {children}
         </div>
