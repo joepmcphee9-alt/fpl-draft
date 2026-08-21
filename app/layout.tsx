@@ -5,6 +5,8 @@ export const metadata = {
   description: "FPL fantasy draft league — AML, Division 2, Division 3",
 };
 
+import Nav from "@/components/Nav";
+
 export default function RootLayout({
   children,
 }: {
@@ -23,13 +25,7 @@ export default function RootLayout({
         }}
       >
         <div style={{ maxWidth: 720, margin: "0 auto" }}>
-          <nav style={{ display: "flex", gap: "1rem", padding: "0.5rem 0", fontSize: "0.9rem" }}>
-            <a href="/" style={{ color: "#e6edf3" }}>Standings</a>
-            <a href="/fixtures" style={{ color: "#e6edf3" }}>Fixtures</a>
-            <a href="/submit" style={{ color: "#e6edf3" }}>Submit lineup</a>
-            <a href="/matchup" style={{ color: "#e6edf3" }}>My matchup</a>
-            <a href="/mom" style={{ color: "#e6edf3" }}>Manager of the Month</a>
-            <a href="/admin" style={{ color: "#e6edf3" }}>Admin</a>
+          <Nav />
           </nav>
           <AuthStatus />
           {children}
