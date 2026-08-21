@@ -44,8 +44,12 @@ export default function SubmissionsPage() {
 
       const { data: entries } = await supabase
         .from("entries")
-        .select("id, division, players(name)")
+        .select("id, division, players(name, email)")
         .order("division", { ascending: true });
+
+      // Exclude memorial/non-playing entries (no email on file — they were
+      // never set up to log in or submit) from the submissions tracker.
+      const playingEntries = (entries ?? []).filter((e: any) => e.players?.email);
 
       const { data: lineups } = await supabase
         .from("lineups")
@@ -57,7 +61,7 @@ export default function SubmissionsPage() {
         submittedMap[l.entry_id] = l.submitted_at;
       });
 
-      const built: Row[] = (entries ?? []).map((e: any) => ({
+      const built: Row[] = playingEntries.map((e: any) => ({
         entryId: e.id,
         managerName: e.players?.name ?? "Unknown",
         division: e.division,
