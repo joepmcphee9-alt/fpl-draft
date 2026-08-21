@@ -27,6 +27,11 @@ async function getFplPlayers(): Promise<PlayerLookup> {
   return map;
 }
 
+async function getLivePoints(gameweek: number): Promise<Record<number, { points: number; minutes: number }>> {
+  const res = await fetch(`/api/fpl-live/${gameweek}`);
+  return res.json();
+}
+
 type Side = {
   entryId: string;
   managerName: string;
@@ -43,6 +48,7 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
   const [playerMap, setPlayerMap] = useState<PlayerLookup>({});
   const [home, setHome] = useState<Side | null>(null);
   const [away, setAway] = useState<Side | null>(null);
+  const [livePoints, setLivePoints] = useState<Record<number, { points: number; minutes: number }>>({});
   const [isBye, setIsBye] = useState(false);
   const [notFound, setNotFound] = useState(false);
 
@@ -90,6 +96,9 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
         supabase.from("entry_scores").select("entry_id, points").eq("gameweek", fixture.gameweek),
         getFplPlayers(),
       ]);
+
+      const live = await getLivePoints(fixture.gameweek);
+      setLivePoints(live);
 
       setPlayerMap(players);
 
@@ -147,11 +156,17 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
           <p style={{ opacity: 0.6, fontSize: "0.9rem" }}>No lineup submitted yet</p>
         ) : (
           <>
-            <div style={{ fontSize: "0.9rem", opacity: 0.85 }}>
+                       <div style={{ fontSize: "0.9rem", opacity: 0.85 }}>
               {sortByPosition(side.startingXi, playerMap).map((id) => {
                 const info = playerMap[id];
                 const tag = id === side.captainId ? " (C)" : id === side.viceCaptainId ? " (VC)" : "";
-                return <div key={id}>{info?.name ?? `id ${id}`}{tag}</div>;
+                const pts = livePoints[id]?.points;
+                return (
+                  <div key={id} style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span>{info?.name ?? `id ${id}`}{tag}</span>
+                    <span style={{ opacity: 0.7 }}>{pts ?? "—"}</span>
+                  </div>
+                );
               })}
             </div>
             {side.benchOrder.some((id) => id !== null) && (
