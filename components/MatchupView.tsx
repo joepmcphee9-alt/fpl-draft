@@ -164,7 +164,7 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
                 const displayPts = isDoubled && rawPts != null ? rawPts * 2 : rawPts;
                 return (
                   <div key={id} style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span>{info?.name ?? `id ${id}`}{tag}{isDoubled ? " x2" : ""}</span>
+                    <span>{info?.name ?? `id ${id}`}{tag}</span>
                     <span style={{ opacity: 0.7 }}>{displayPts ?? "—"}</span>
                   </div>
                 );
