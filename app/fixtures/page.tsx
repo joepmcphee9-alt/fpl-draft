@@ -127,9 +127,7 @@ export default async function FixturesPage({
                       )}
                     </div>
                   );
-                  return f.is_bye ? (
-                    <div key={f.id}>{content}</div>
-                  ) : (
+                  return (
                     <a key={f.id} href={`/matchup/${f.id}`} style={{ textDecoration: "none", color: "inherit", display: "block" }}>
                       {content}
                     </a>
