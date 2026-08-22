@@ -68,11 +68,8 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
 
       setGameweek(fixture.gameweek);
 
-      if (fixture.is_bye) {
-        setIsBye(true);
-        setLoading(false);
-        return;
-      }
+      const homeOnly = fixture.is_bye;
+      setIsBye(homeOnly);
 
       const [homeLineup, awayLineup, homeEntryInfo, awayEntryInfo, scores, players] = await Promise.all([
         supabase
@@ -81,7 +78,7 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
           .eq("entry_id", fixture.home_entry_id)
           .eq("gameweek", fixture.gameweek)
           .maybeSingle(),
-        fixture.away_entry_id
+        !homeOnly && fixture.away_entry_id
           ? supabase
               .from("lineups")
               .select("starting_xi, captain_id, vice_captain_id, bench_order")
@@ -90,7 +87,7 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
               .maybeSingle()
           : Promise.resolve({ data: null }),
         supabase.from("entries").select("id, players(name)").eq("id", fixture.home_entry_id).maybeSingle(),
-        fixture.away_entry_id
+        !homeOnly && fixture.away_entry_id
           ? supabase.from("entries").select("id, players(name)").eq("id", fixture.away_entry_id).maybeSingle()
           : Promise.resolve({ data: null }),
         supabase.from("entry_scores").select("entry_id, points").eq("gameweek", fixture.gameweek),
@@ -118,7 +115,7 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
         benchOrder: homeLineup.data?.bench_order ?? [],
       });
 
-      if (fixture.away_entry_id) {
+      if (fixture.away_entry_id && !homeOnly) {
         setAway({
           entryId: fixture.away_entry_id,
           managerName: awayName,
@@ -138,16 +135,18 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
   if (loading) return <p>Loading…</p>;
   if (notFound) return <p style={{ opacity: 0.6 }}>Fixture not found.</p>;
 
-  if (isBye) {
-    return (
-      <div>
-        <p style={{ opacity: 0.7 }}>{home?.managerName ?? "This manager"} has a bye this week.</p>
-      </div>
-    );
-  }
-
   const renderSide = (side: Side | null) => {
     if (!side) return <p style={{ opacity: 0.6 }}>No data</p>;
+
+    const captainStats = livePoints[side.captainId ?? -1];
+    const viceStats = livePoints[side.viceCaptainId ?? -1];
+    const effectiveCaptainId =
+      captainStats && captainStats.minutes > 0
+        ? side.captainId
+        : viceStats && viceStats.minutes > 0
+        ? side.viceCaptainId
+        : null;
+
     return (
       <div style={{ flex: 1 }}>
         <h3>{side.managerName}</h3>
@@ -156,15 +155,17 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
           <p style={{ opacity: 0.6, fontSize: "0.9rem" }}>No lineup submitted yet</p>
         ) : (
           <>
-                       <div style={{ fontSize: "0.9rem", opacity: 0.85 }}>
+            <div style={{ fontSize: "0.9rem", opacity: 0.85 }}>
               {sortByPosition(side.startingXi, playerMap).map((id) => {
                 const info = playerMap[id];
                 const tag = id === side.captainId ? " (C)" : id === side.viceCaptainId ? " (VC)" : "";
-                const pts = livePoints[id]?.points;
+                const rawPts = livePoints[id]?.points;
+                const isDoubled = id === effectiveCaptainId;
+                const displayPts = isDoubled && rawPts != null ? rawPts * 2 : rawPts;
                 return (
                   <div key={id} style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span>{info?.name ?? `id ${id}`}{tag}</span>
-                    <span style={{ opacity: 0.7 }}>{pts ?? "—"}</span>
+                    <span>{info?.name ?? `id ${id}`}{tag}{isDoubled ? " x2" : ""}</span>
+                    <span style={{ opacity: 0.7 }}>{displayPts ?? "—"}</span>
                   </div>
                 );
               })}
@@ -188,6 +189,15 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
       </div>
     );
   };
+
+  if (isBye) {
+    return (
+      <div>
+        <p style={{ opacity: 0.7, marginBottom: "1rem" }}>Bye week — no opponent, but your squad still scores.</p>
+        {renderSide(home)}
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: "flex", gap: "2rem" }}>
