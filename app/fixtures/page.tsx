@@ -101,21 +101,28 @@ export default async function FixturesPage({
                   const content = (
                     <div
                       style={{
-                        display: "flex",
-                        justifyContent: "space-between",
+                        display: "grid",
+                        gridTemplateColumns: "1fr auto 1fr",
+                        alignItems: "center",
                         padding: "0.5rem 0",
                         borderBottom: "1px solid #1c2530",
                       }}
                     >
                       {f.is_bye ? (
-                        <span>{f.home?.players?.name ?? "—"} — Bye</span>
+                        <>
+                          <span style={{ textAlign: "left" }}>{f.home?.players?.name ?? "—"}</span>
+                          <span style={{ textAlign: "center", opacity: 0.6, padding: "0 1rem" }}>
+                            {homeScore ?? "—"} pts
+                          </span>
+                          <span style={{ textAlign: "right", opacity: 0.6 }}>Bye</span>
+                        </>
                       ) : (
                         <>
-                          <span>{f.home?.players?.name ?? "—"}</span>
-                          <span style={{ opacity: 0.6 }}>
+                          <span style={{ textAlign: "left" }}>{f.home?.players?.name ?? "—"}</span>
+                          <span style={{ textAlign: "center", opacity: 0.6, padding: "0 1rem" }}>
                             {homeScore ?? "—"} v {awayScore ?? "—"}
                           </span>
-                          <span>{f.away?.players?.name ?? "—"}</span>
+                          <span style={{ textAlign: "right" }}>{f.away?.players?.name ?? "—"}</span>
                         </>
                       )}
                     </div>
