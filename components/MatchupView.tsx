@@ -138,14 +138,12 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
   const renderSide = (side: Side | null) => {
     if (!side) return <p style={{ opacity: 0.6 }}>No data</p>;
 
-    const captainStats = livePoints[side.captainId ?? -1];
-    const viceStats = livePoints[side.viceCaptainId ?? -1];
-    const effectiveCaptainId =
-      captainStats && captainStats.minutes > 0
-        ? side.captainId
-        : viceStats && viceStats.minutes > 0
-        ? side.viceCaptainId
-        : null;
+    // Note: we deliberately don't auto-swap to the vice-captain here. FPL's
+    // real rule only applies once the captain's entire gameweek is finished
+    // with 0 minutes — not just "hasn't kicked off yet" — which needs fixture
+    // status data we don't have wired in yet. Always doubling the named
+    // captain is the safer approximation until that's built properly.
+    const effectiveCaptainId = side.captainId;
 
     return (
       <div style={{ flex: 1 }}>
