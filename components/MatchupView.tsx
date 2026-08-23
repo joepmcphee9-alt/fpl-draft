@@ -40,7 +40,10 @@ type Side = {
   captainId: number | null;
   viceCaptainId: number | null;
   benchOrder: (number | null)[];
+  appliedSubs: { out: number; in: number }[] | null;
 };
+
+const SUB_COLORS = ["#f85149", "#f1c40f", "#3fb950", "#58a6ff", "#bc8cff"];
 
 export default function MatchupView({ fixtureId }: { fixtureId: string }) {
   const [loading, setLoading] = useState(true);
@@ -90,7 +93,7 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
         !homeOnly && fixture.away_entry_id
           ? supabase.from("entries").select("id, players(name)").eq("id", fixture.away_entry_id).maybeSingle()
           : Promise.resolve({ data: null }),
-        supabase.from("entry_scores").select("entry_id, points").eq("gameweek", fixture.gameweek),
+        supabase.from("entry_scores").select("entry_id, points, applied_subs").eq("gameweek", fixture.gameweek),
         getFplPlayers(),
       ]);
 
@@ -100,7 +103,11 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
       setPlayerMap(players);
 
       const scoreMap: Record<string, number> = {};
-      (scores.data ?? []).forEach((r: any) => (scoreMap[r.entry_id] = r.points));
+      const subsMap: Record<string, { out: number; in: number }[] | null> = {};
+      (scores.data ?? []).forEach((r: any) => {
+        scoreMap[r.entry_id] = r.points;
+        subsMap[r.entry_id] = r.applied_subs;
+      });
 
       const homeName = (homeEntryInfo.data as any)?.players?.name ?? "Home";
       const awayName = (awayEntryInfo.data as any)?.players?.name ?? "Away";
@@ -113,6 +120,7 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
         captainId: homeLineup.data?.captain_id ?? null,
         viceCaptainId: homeLineup.data?.vice_captain_id ?? null,
         benchOrder: homeLineup.data?.bench_order ?? [],
+        appliedSubs: subsMap[fixture.home_entry_id] ?? null,
       });
 
       if (fixture.away_entry_id && !homeOnly) {
@@ -124,6 +132,7 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
           captainId: awayLineup.data?.captain_id ?? null,
           viceCaptainId: awayLineup.data?.vice_captain_id ?? null,
           benchOrder: awayLineup.data?.bench_order ?? [],
+          appliedSubs: subsMap[fixture.away_entry_id] ?? null,
         });
       }
 
@@ -138,69 +147,28 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
   const renderSide = (side: Side | null) => {
     if (!side) return <p style={{ opacity: 0.6 }}>No data</p>;
 
-    // Note: we deliberately don't auto-swap to the vice-captain here. FPL's
-    // real rule only applies once the captain's entire gameweek is finished
-    // with 0 minutes — not just "hasn't kicked off yet" — which needs fixture
-    // status data we don't have wired in yet. Always doubling the named
-    // captain is the safer approximation until that's built properly.
+    const subs = side.appliedSubs || [];
+    const colorForPlayer = (id: number) => {
+      const idx = subs.findIndex((s) => s.out === id || s.in === id);
+      return idx >= 0 ? SUB_COLORS[idx % SUB_COLORS.length] : undefined;
+    };
+    // The effective XI reflects any applied substitutions — this is what
+    // actually counted toward the score, so it's what gets displayed.
+    const effectiveXi = side.startingXi.map((id) => {
+      const sub = subs.find((s) => s.out === id);
+      return sub ? sub.in : id;
+    });
+
+    // Note: we deliberately don't auto-swap to the vice-captain here for a
+    // player who simply hasn't kicked off yet. Always doubling the named
+    // captain is the safer approximation for a captain still to play.
     const effectiveCaptainId = side.captainId;
 
     return (
       <div style={{ flex: 1 }}>
         <h3>{side.managerName}</h3>
         <p style={{ fontSize: "1.8rem", margin: "0.3rem 0" }}>{side.score ?? "—"}</p>
-        {side.startingXi.length === 0 ? (
+        {effectiveXi.length === 0 ? (
           <p style={{ opacity: 0.6, fontSize: "0.9rem" }}>No lineup submitted yet</p>
         ) : (
           <>
-            <div style={{ fontSize: "0.9rem", opacity: 0.85 }}>
-              {sortByPosition(side.startingXi, playerMap).map((id) => {
-                const info = playerMap[id];
-                const tag = id === side.captainId ? " (C)" : id === side.viceCaptainId ? " (VC)" : "";
-                const rawPts = livePoints[id]?.points;
-                const isDoubled = id === effectiveCaptainId;
-                const displayPts = isDoubled && rawPts != null ? rawPts * 2 : rawPts;
-                return (
-                  <div key={id} style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span>{info?.name ?? `id ${id}`}{tag}</span>
-                    <span style={{ opacity: 0.7 }}>{displayPts ?? "—"}</span>
-                  </div>
-                );
-              })}
-            </div>
-            {side.benchOrder.some((id) => id !== null) && (
-              <>
-                <p style={{ marginTop: "1rem", marginBottom: "0.3rem", fontSize: "0.8rem", opacity: 0.6 }}>
-                  Bench
-                </p>
-                <div style={{ fontSize: "0.85rem", opacity: 0.7 }}>
-                  {side.benchOrder.map((id, i) =>
-                    id ? (
-                      <div key={i}>{i + 1}. {playerMap[id]?.name ?? `id ${id}`}</div>
-                    ) : null
-                  )}
-                </div>
-              </>
-            )}
-          </>
-        )}
-      </div>
-    );
-  };
-
-  if (isBye) {
-    return (
-      <div>
-        <p style={{ opacity: 0.7, marginBottom: "1rem" }}>Bye week — no opponent, but your squad still scores.</p>
-        {renderSide(home)}
-      </div>
-    );
-  }
-
-  return (
-    <div style={{ display: "flex", gap: "2rem" }}>
-      {renderSide(home)}
-      {renderSide(away)}
-    </div>
-  );
-}
