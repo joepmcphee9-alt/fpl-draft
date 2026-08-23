@@ -172,3 +172,66 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
           <p style={{ opacity: 0.6, fontSize: "0.9rem" }}>No lineup submitted yet</p>
         ) : (
           <>
+            <div style={{ fontSize: "0.9rem", opacity: 0.85 }}>
+              {sortByPosition(effectiveXi, playerMap).map((id) => {
+                const info = playerMap[id];
+                const tag = id === side.captainId ? " (C)" : id === side.viceCaptainId ? " (VC)" : "";
+                const rawPts = livePoints[id]?.points;
+                const isDoubled = id === effectiveCaptainId;
+                const displayPts = isDoubled && rawPts != null ? rawPts * 2 : rawPts;
+                const color = colorForPlayer(id);
+                return (
+                  <div key={id} style={{ display: "flex", justifyContent: "space-between", color: color || undefined }}>
+                    <span>{info?.name ?? `id ${id}`}{tag}</span>
+                    <span style={{ opacity: color ? 1 : 0.7 }}>{displayPts ?? "—"}</span>
+                  </div>
+                );
+              })}
+            </div>
+            {subs.length > 0 && (
+              <div style={{ fontSize: "0.8rem", opacity: 0.7, marginTop: "0.5rem" }}>
+                {subs.map((s, i) => (
+                  <div key={i} style={{ color: SUB_COLORS[i % SUB_COLORS.length] }}>
+                    Sub: {playerMap[s.out]?.name ?? s.out} → {playerMap[s.in]?.name ?? s.in}
+                  </div>
+                ))}
+              </div>
+            )}
+            {side.benchOrder.some((id) => id !== null) && (
+              <>
+                <p style={{ marginTop: "1rem", marginBottom: "0.3rem", fontSize: "0.8rem", opacity: 0.6 }}>
+                  Bench
+                </p>
+                <div style={{ fontSize: "0.85rem", opacity: 0.7 }}>
+                  {side.benchOrder.map((id, i) =>
+                    id ? (
+                      <div key={i} style={{ color: colorForPlayer(id) || undefined }}>
+                        {i + 1}. {playerMap[id]?.name ?? `id ${id}`}
+                      </div>
+                    ) : null
+                  )}
+                </div>
+              </>
+            )}
+          </>
+        )}
+      </div>
+    );
+  };
+
+  if (isBye) {
+    return (
+      <div>
+        <p style={{ opacity: 0.7, marginBottom: "1rem" }}>Bye week — no opponent, but your squad still scores.</p>
+        {renderSide(home)}
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display: "flex", gap: "2rem" }}>
+      {renderSide(home)}
+      {renderSide(away)}
+    </div>
+  );
+}
