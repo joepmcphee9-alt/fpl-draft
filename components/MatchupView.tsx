@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
-type PlayerLookup = Record<number, { name: string; position: string }>;
+type PlayerLookup = Record<number, { name: string; position: string; team: number }>;
+type FixtureStatus = "not_started" | "live" | "finished";
 
 const POSITION_ORDER = ["GK", "DEF", "MID", "FWD"];
 
@@ -21,7 +22,7 @@ async function getFplPlayers(): Promise<PlayerLookup> {
   const players = await res.json();
   const map: PlayerLookup = {};
   players.forEach((p: any) => {
-    map[p.id] = { name: p.name, position: p.position };
+    map[p.id] = { name: p.name, position: p.position, team: p.team };
   });
   fplPlayersCache = map;
   return map;
@@ -31,6 +32,22 @@ async function getLivePoints(gameweek: number): Promise<Record<number, { points:
   const res = await fetch(`/api/fpl-live/${gameweek}`);
   return res.json();
 }
+
+async function getFixtureStatus(gameweek: number): Promise<Record<number, FixtureStatus>> {
+  const res = await fetch(`/api/fpl-fixtures/${gameweek}`);
+  return res.json();
+}
+
+const STATUS_LABEL: Record<FixtureStatus, string> = {
+  not_started: "Not started",
+  live: "Live",
+  finished: "FT",
+};
+const STATUS_COLOR: Record<FixtureStatus, string> = {
+  not_started: "#8b949e",
+  live: "#3fb950",
+  finished: "#58a6ff",
+};
 
 type Side = {
   entryId: string;
@@ -52,6 +69,7 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
   const [home, setHome] = useState<Side | null>(null);
   const [away, setAway] = useState<Side | null>(null);
   const [livePoints, setLivePoints] = useState<Record<number, { points: number; minutes: number }>>({});
+  const [fixtureStatus, setFixtureStatus] = useState<Record<number, FixtureStatus>>({});
   const [isBye, setIsBye] = useState(false);
   const [notFound, setNotFound] = useState(false);
 
@@ -97,8 +115,12 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
         getFplPlayers(),
       ]);
 
-      const live = await getLivePoints(fixture.gameweek);
+      const [live, status] = await Promise.all([
+        getLivePoints(fixture.gameweek),
+        getFixtureStatus(fixture.gameweek),
+      ]);
       setLivePoints(live);
+      setFixtureStatus(status);
 
       setPlayerMap(players);
 
@@ -152,16 +174,11 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
       const idx = subs.findIndex((s) => s.out === id || s.in === id);
       return idx >= 0 ? SUB_COLORS[idx % SUB_COLORS.length] : undefined;
     };
-    // The effective XI reflects any applied substitutions — this is what
-    // actually counted toward the score, so it's what gets displayed.
     const effectiveXi = side.startingXi.map((id) => {
       const sub = subs.find((s) => s.out === id);
       return sub ? sub.in : id;
     });
 
-    // Note: we deliberately don't auto-swap to the vice-captain here for a
-    // player who simply hasn't kicked off yet. Always doubling the named
-    // captain is the safer approximation for a captain still to play.
     const effectiveCaptainId = side.captainId;
 
     return (
@@ -180,9 +197,18 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
                 const isDoubled = id === effectiveCaptainId;
                 const displayPts = isDoubled && rawPts != null ? rawPts * 2 : rawPts;
                 const color = colorForPlayer(id);
+                const status = info ? fixtureStatus[info.team] : undefined;
                 return (
-                  <div key={id} style={{ display: "flex", justifyContent: "space-between", color: color || undefined }}>
-                    <span>{info?.name ?? `id ${id}`}{tag}</span>
+                  <div key={id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: color || undefined }}>
+                    <span style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                      {status && (
+                        <span
+                          title={STATUS_LABEL[status]}
+                          style={{ width: 7, height: 7, borderRadius: "50%", background: STATUS_COLOR[status], flexShrink: 0 }}
+                        />
+                      )}
+                      {info?.name ?? `id ${id}`}{tag}
+                    </span>
                     <span style={{ opacity: color ? 1 : 0.7 }}>{displayPts ?? "—"}</span>
                   </div>
                 );
@@ -203,16 +229,30 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
                   Bench
                 </p>
                 <div style={{ fontSize: "0.85rem", opacity: 0.7 }}>
-                  {side.benchOrder.map((id, i) =>
-                    id ? (
-                      <div key={i} style={{ color: colorForPlayer(id) || undefined }}>
-                        {i + 1}. {playerMap[id]?.name ?? `id ${id}`}
+                  {side.benchOrder.map((id, i) => {
+                    if (!id) return null;
+                    const info = playerMap[id];
+                    const status = info ? fixtureStatus[info.team] : undefined;
+                    return (
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: "0.4rem", color: colorForPlayer(id) || undefined }}>
+                        {status && (
+                          <span
+                            title={STATUS_LABEL[status]}
+                            style={{ width: 6, height: 6, borderRadius: "50%", background: STATUS_COLOR[status], flexShrink: 0 }}
+                          />
+                        )}
+                        {i + 1}. {info?.name ?? `id ${id}`}
                       </div>
-                    ) : null
-                  )}
+                    );
+                  })}
                 </div>
               </>
             )}
+            <p style={{ fontSize: "0.75rem", opacity: 0.5, marginTop: "0.75rem" }}>
+              <span style={{ color: STATUS_COLOR.not_started }}>●</span> Not started &nbsp;
+              <span style={{ color: STATUS_COLOR.live }}>●</span> Live &nbsp;
+              <span style={{ color: STATUS_COLOR.finished }}>●</span> Full-time
+            </p>
           </>
         )}
       </div>

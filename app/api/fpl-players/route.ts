@@ -13,6 +13,7 @@ export async function GET() {
     id: el.id,
     name: el.web_name,
     position: positionNames[el.element_type] ?? "UNK",
+    team: el.team,
   }));
 
   return Response.json(players);
