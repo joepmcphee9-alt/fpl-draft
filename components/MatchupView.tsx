@@ -233,15 +233,19 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
                     if (!id) return null;
                     const info = playerMap[id];
                     const status = info ? fixtureStatus[info.team] : undefined;
+                    const pts = livePoints[id]?.points;
                     return (
-                      <div key={i} style={{ display: "flex", alignItems: "center", gap: "0.4rem", color: colorForPlayer(id) || undefined }}>
-                        {status && (
-                          <span
-                            title={STATUS_LABEL[status]}
-                            style={{ width: 6, height: 6, borderRadius: "50%", background: STATUS_COLOR[status], flexShrink: 0 }}
-                          />
-                        )}
-                        {i + 1}. {info?.name ?? `id ${id}`}
+                      <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: colorForPlayer(id) || undefined }}>
+                        <span style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                          {status && (
+                            <span
+                              title={STATUS_LABEL[status]}
+                              style={{ width: 6, height: 6, borderRadius: "50%", background: STATUS_COLOR[status], flexShrink: 0 }}
+                            />
+                          )}
+                          {i + 1}. {info?.name ?? `id ${id}`}
+                        </span>
+                        <span>{pts ?? "—"}</span>
                       </div>
                     );
                   })}
