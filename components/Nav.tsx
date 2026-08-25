@@ -8,6 +8,7 @@ const links = [
   { href: "/fixtures", label: "Fixtures & Results" },
   { href: "/submit", label: "Submit lineup" },
   { href: "/matchup", label: "My matchup" },
+  { href: "/weekly-updates", label: "Weekly Updates" },
   { href: "/mom", label: "Manager of the Month" },
   { href: "/draft-history", label: "Draft History" },
   { href: "/michu-cup", label: "Michu Cup" },
