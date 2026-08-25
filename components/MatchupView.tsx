@@ -166,6 +166,7 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
   if (loading) return <p>Loading…</p>;
   if (notFound) return <p style={{ opacity: 0.6 }}>Fixture not found.</p>;
 
+  const maxSubsCount = Math.max(home?.appliedSubs?.length ?? 0, away?.appliedSubs?.length ?? 0);
   const renderSide = (side: Side | null) => {
     if (!side) return <p style={{ opacity: 0.6 }}>No data</p>;
 
@@ -214,8 +215,8 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
                 );
               })}
             </div>
-            {subs.length > 0 && (
-              <div style={{ fontSize: "0.8rem", opacity: 0.7, marginTop: "0.5rem" }}>
+            {maxSubsCount > 0 && (
+              <div style={{ fontSize: "0.8rem", opacity: 0.7, marginTop: "0.5rem", minHeight: `${maxSubsCount * 1.2}rem` }}>
                 {subs.map((s, i) => (
                   <div key={i} style={{ color: SUB_COLORS[i % SUB_COLORS.length] }}>
                     Sub: {playerMap[s.out]?.name ?? s.out} → {playerMap[s.in]?.name ?? s.in}
