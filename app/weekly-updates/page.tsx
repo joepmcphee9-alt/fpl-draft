@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
 
 export default async function WeeklyUpdatesPage() {
-  const { data: reports } = await supabase
+  const { data: reports, error } = await supabase
     .from("weekly_reports")
     .select("gameweek, title, body, published_at")
     .order("gameweek", { ascending: false });
@@ -10,7 +10,10 @@ export default async function WeeklyUpdatesPage() {
     <main>
       <h1>Weekly Updates</h1>
 
-      {(!reports || reports.length === 0) && (
+      {error && (
+        <p style={{ color: "#f85149", marginTop: "1rem" }}>Error: {error.message}</p>
+      )}
+      {!error && (!reports || reports.length === 0) && (
         <p style={{ opacity: 0.6, marginTop: "1rem" }}>No reports published yet.</p>
       )}
 
