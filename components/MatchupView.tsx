@@ -167,6 +167,7 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
   if (notFound) return <p style={{ opacity: 0.6 }}>Fixture not found.</p>;
 
   const maxSubsCount = Math.max(home?.appliedSubs?.length ?? 0, away?.appliedSubs?.length ?? 0);
+
   const renderSide = (side: Side | null) => {
     if (!side) return <p style={{ opacity: 0.6 }}>No data</p>;
 
@@ -181,6 +182,11 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
     });
 
     const effectiveCaptainId = side.captainId;
+
+    const anyBlank = effectiveXi.some((id) => {
+      const info = playerMap[id];
+      return info && fixtureStatus[info.team] === "finished" && livePoints[id]?.minutes === 0;
+    });
 
     return (
       <div style={{ flex: 1 }}>
@@ -199,6 +205,7 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
                 const displayPts = isDoubled && rawPts != null ? rawPts * 2 : rawPts;
                 const color = colorForPlayer(id);
                 const status = info ? fixtureStatus[info.team] : undefined;
+                const isBlank = info && status === "finished" && livePoints[id]?.minutes === 0;
                 return (
                   <div key={id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: color || undefined }}>
                     <span style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
@@ -208,13 +215,18 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
                           style={{ width: 7, height: 7, borderRadius: "50%", background: STATUS_COLOR[status], flexShrink: 0 }}
                         />
                       )}
-                      {info?.name ?? `id ${id}`}{tag}
+                      {info?.name ?? `id ${id}`}{tag}{isBlank ? " *" : ""}
                     </span>
                     <span style={{ opacity: color ? 1 : 0.7 }}>{displayPts ?? "—"}</span>
                   </div>
                 );
               })}
             </div>
+            {anyBlank && (
+              <p style={{ fontSize: "0.75rem", opacity: 0.6, marginTop: "0.3rem" }}>
+                * Did not feature — no eligible bench replacement available
+              </p>
+            )}
             {maxSubsCount > 0 && (
               <div style={{ fontSize: "0.8rem", opacity: 0.7, marginTop: "0.5rem", minHeight: `${maxSubsCount * 1.2}rem` }}>
                 {subs.map((s, i) => (
