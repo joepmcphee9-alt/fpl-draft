@@ -21,6 +21,43 @@ function bandStyle(division: number, position: number): React.CSSProperties {
   return {};
 }
 
+// A gameweek only counts toward the table once its deadline has actually
+// passed — this stops a freshly-flipped gameweek showing as a wave of false
+// 0-0 draws before a single match has kicked off (Luke's scoring script
+// writes a valid 0 total for every lineup on every run, even pre-kickoff).
+async function getPassedDeadlineGameweeks(): Promise<Set<number>> {
+  const res = await fetch("https://fantasy.premierleague.com/api/bootstrap-static/");
+  const data = await res.json();
+  const now = new Date();
+  const passed = new Set<number>();
+  data.events.forEach((ev: any) => {
+    if (new Date(ev.deadline_time) < now) passed.add(ev.id);
+  });
+  return passed;
+}
+
+// Works out whether the current gameweek hasn't started, is live, or is
+// fully complete — for the status banner at the top of the table.
+async function getGameweekBannerInfo(): Promise<{ gameweek: number; status: "upcoming" | "live" | "complete" }> {
+  const settingsRes = await supabase.from("league_settings").select("current_gameweek").maybeSingle();
+  const gameweek = settingsRes.data?.current_gameweek ?? 1;
+
+  const bootstrapRes = await fetch("https://fantasy.premierleague.com/api/bootstrap-static/");
+  const bootstrapData = await bootstrapRes.json();
+  const event = bootstrapData.events.find((ev: any) => ev.id === gameweek);
+  const deadlinePassed = event ? new Date(event.deadline_time) < new Date() : false;
+
+  if (!deadlinePassed) {
+    return { gameweek, status: "upcoming" };
+  }
+
+  const fixturesRes = await fetch(`https://fantasy.premierleague.com/api/fixtures/?event=${gameweek}`);
+  const fixturesData = await fixturesRes.json();
+  const allFinished = fixturesData.every((f: any) => f.finished_provisional === true);
+
+  return { gameweek, status: allFinished ? "complete" : "live" };
+}
+
 type Row = {
   entryId: string;
   managerName: string;
@@ -34,12 +71,15 @@ type Row = {
 };
 
 export default async function TablePage() {
-  const [{ data: entries }, { data: fixtures }, { data: scores }, { data: penalties }] = await Promise.all([
-    supabase.from("entries").select("id, division, players(name, email)"),
-    supabase.from("fixtures").select("division, gameweek, home_entry_id, away_entry_id, is_bye").eq("is_bye", false),
-    supabase.from("entry_scores").select("entry_id, gameweek, points"),
-    supabase.from("penalties").select("entry_id, points"),
-  ]);
+  const [{ data: entries }, { data: fixtures }, { data: scores }, { data: penalties }, passedGameweeks, bannerInfo] =
+    await Promise.all([
+      supabase.from("entries").select("id, division, players(name, email)"),
+      supabase.from("fixtures").select("division, gameweek, home_entry_id, away_entry_id, is_bye").eq("is_bye", false),
+      supabase.from("entry_scores").select("entry_id, gameweek, points"),
+      supabase.from("penalties").select("entry_id, points"),
+      getPassedDeadlineGameweeks(),
+      getGameweekBannerInfo(),
+    ]);
 
   const scoreByEntryGw: Record<string, number> = {};
   (scores ?? []).forEach((s) => {
@@ -70,12 +110,14 @@ export default async function TablePage() {
   });
 
   (fixtures ?? []).forEach((f) => {
-    if (!f.away_entry_id) return; // safety, shouldn't happen for non-bye rows
+    if (!f.away_entry_id) return;
+    if (!passedGameweeks.has(f.gameweek)) return; // deadline hasn't passed — not live/played yet
+
     const homeKey = `${f.home_entry_id}:${f.gameweek}`;
     const awayKey = `${f.away_entry_id}:${f.gameweek}`;
     const homeScore = scoreByEntryGw[homeKey];
     const awayScore = scoreByEntryGw[awayKey];
-    if (homeScore == null || awayScore == null) return; // not played/scored yet
+    if (homeScore == null || awayScore == null) return;
 
     const homeRow = rowsByEntry[f.home_entry_id];
     const awayRow = rowsByEntry[f.away_entry_id];
@@ -102,9 +144,22 @@ export default async function TablePage() {
 
   const divisions = [1, 2, 3];
 
+  const bannerText =
+    bannerInfo.status === "upcoming"
+      ? `Gameweek ${bannerInfo.gameweek} — starts soon`
+      : bannerInfo.status === "live"
+      ? `Gameweek ${bannerInfo.gameweek} — LIVE`
+      : `Gameweek ${bannerInfo.gameweek} — Complete`;
+  const bannerColor =
+    bannerInfo.status === "upcoming" ? "#8b949e" : bannerInfo.status === "live" ? "#3fb950" : "#58a6ff";
+
   return (
     <main>
       <h1>League Table</h1>
+      <p style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.3rem 0.8rem", borderRadius: 6, background: "rgba(255,255,255,0.05)", fontSize: "0.9rem", marginBottom: "1rem" }}>
+        <span style={{ width: 8, height: 8, borderRadius: "50%", background: bannerColor }} />
+        {bannerText}
+      </p>
 
       {divisions.map((div) => {
         const divEntryIds = new Set(playingEntries.filter((e: any) => e.division === div).map((e: any) => e.id));
