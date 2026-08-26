@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 type LeagueSettings = { current_gameweek: number; deadline: string };
-type SquadPlayer = { id: number; name: string; position: string };
+type SquadPlayer = { id: number; name: string; position: string; team: number };
+type OpponentInfo = { opponent: string; isHome: boolean };
 
 const inputStyle = {
   padding: "0.5rem",
@@ -20,14 +21,25 @@ const MAX_STARTERS = 11;
 const BENCH_SIZE = 7;
 const VALID_FORMATIONS = ["3-4-3", "3-5-2", "4-4-2", "4-3-3", "4-5-1", "5-4-1", "5-3-2", "5-2-3"];
 
-async function getFplPlayers(): Promise<Record<number, { name: string; position: string }>> {
+async function getFplPlayers(): Promise<Record<number, { name: string; position: string; team: number }>> {
   const res = await fetch("/api/fpl-players");
   const players = await res.json();
-  const map: Record<number, { name: string; position: string }> = {};
+  const map: Record<number, { name: string; position: string; team: number }> = {};
   players.forEach((p: any) => {
-    map[p.id] = { name: p.name, position: p.position };
+    map[p.id] = { name: p.name, position: p.position, team: p.team };
   });
   return map;
+}
+
+async function getOpponents(gameweek: number): Promise<Record<number, OpponentInfo>> {
+  const res = await fetch(`/api/fpl-opponents/${gameweek}`);
+  return res.json();
+}
+
+function fixtureLabel(opponents: Record<number, OpponentInfo>, team: number): string {
+  const info = opponents[team];
+  if (!info) return "";
+  return info.isHome ? `Home to ${info.opponent}` : `Away to ${info.opponent}`;
 }
 
 export default function SubmitPage() {
@@ -35,6 +47,7 @@ export default function SubmitPage() {
   const [settings, setSettings] = useState<LeagueSettings | null>(null);
   const [entryId, setEntryId] = useState<string | null>(null);
   const [squad, setSquad] = useState<SquadPlayer[]>([]);
+  const [opponents, setOpponents] = useState<Record<number, OpponentInfo>>({});
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [benchOrder, setBenchOrder] = useState<(number | null)[]>(Array(BENCH_SIZE).fill(null));
   const [captainId, setCaptainId] = useState<number | null>(null);
@@ -93,12 +106,16 @@ export default function SubmitPage() {
             id: r.fpl_player_id,
             name: info?.name ?? `Unknown (id ${r.fpl_player_id})`,
             position: info?.position ?? "UNK",
+            team: info?.team ?? 0,
           };
         })
         .sort((a, b) => a.name.localeCompare(b.name));
       setSquad(squadList);
 
       if (settingsData) {
+        const opponentData = await getOpponents(settingsData.current_gameweek);
+        setOpponents(opponentData);
+
         const { data: existing } = await supabase
           .from("lineups")
           .select("submitted_at, starting_xi, captain_id, vice_captain_id, bench_order")
@@ -143,8 +160,8 @@ export default function SubmitPage() {
         if (viceCaptainId === player.id) setViceCaptainId(null);
         setBenchOrder((b) => b.map((id) => (id === player.id ? null : id)));
       } else {
-        if (next.size >= MAX_STARTERS) return prev; // full
-        if (player.position === "GK" && gkCount >= 1) return prev; // only 1 GK starts
+        if (next.size >= MAX_STARTERS) return prev;
+        if (player.position === "GK" && gkCount >= 1) return prev;
         next.add(player.id);
         setBenchOrder((b) => b.map((id) => (id === player.id ? null : id)));
       }
@@ -155,7 +172,6 @@ export default function SubmitPage() {
   const setBenchSlot = (slotIndex: number, playerId: number | null) => {
     setBenchOrder((prev) => {
       const next = [...prev];
-      // clear this player from any other slot first
       for (let i = 0; i < next.length; i++) {
         if (next[i] === playerId) next[i] = null;
       }
@@ -267,15 +283,19 @@ export default function SubmitPage() {
                 const isChecked = selected.has(p.id);
                 const wouldExceedMax = !isChecked && selected.size >= MAX_STARTERS;
                 const wouldExceedGk = !isChecked && p.position === "GK" && gkCount >= 1;
+                const fixture = fixtureLabel(opponents, p.team);
                 return (
-                  <label key={p.id} style={{ display: "flex", alignItems: "center", gap: "0.5rem", opacity: wouldExceedMax || wouldExceedGk ? 0.4 : 1 }}>
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      disabled={deadlinePassed || wouldExceedMax || wouldExceedGk}
-                      onChange={() => togglePlayer(p)}
-                    />
-                    {p.name}
+                  <label key={p.id} style={{ display: "flex", alignItems: "center", gap: "0.5rem", justifyContent: "space-between", opacity: wouldExceedMax || wouldExceedGk ? 0.4 : 1 }}>
+                    <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        disabled={deadlinePassed || wouldExceedMax || wouldExceedGk}
+                        onChange={() => togglePlayer(p)}
+                      />
+                      {p.name}
+                    </span>
+                    {fixture && <span style={{ opacity: 0.5, fontSize: "0.8rem" }}>{fixture}</span>}
                   </label>
                 );
               })}
