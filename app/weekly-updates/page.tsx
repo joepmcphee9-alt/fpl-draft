@@ -1,5 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function WeeklyUpdatesPage() {
   const { data: reports, error } = await supabase
     .from("weekly_reports")
