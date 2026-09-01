@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const res = await fetch("https://fantasy.premierleague.com/api/bootstrap-static/");
   const data = await res.json();

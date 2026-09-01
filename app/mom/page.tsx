@@ -9,8 +9,8 @@ const divisionNames: Record<number, string> = {
 type GameweekInfo = { gameweek: number; monthKey: string; monthLabel: string };
 
 async function getGameweekMonths(): Promise<GameweekInfo[]> {
-  const res = await fetch("https://fantasy.premierleague.com/api/bootstrap-static/");
-  const data = await res.json();
+   const res = await fetch("https://fantasy.premierleague.com/api/bootstrap-static/", { cache: "no-store" });
+   const data = await res.json();
 
   return data.events.map((ev: any) => {
     const d = new Date(ev.deadline_time);

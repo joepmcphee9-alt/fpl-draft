@@ -26,7 +26,7 @@ function bandStyle(division: number, position: number): React.CSSProperties {
 // 0-0 draws before a single match has kicked off (Luke's scoring script
 // writes a valid 0 total for every lineup on every run, even pre-kickoff).
 async function getPassedDeadlineGameweeks(): Promise<Set<number>> {
-  const res = await fetch("https://fantasy.premierleague.com/api/bootstrap-static/");
+  const res = await fetch("https://fantasy.premierleague.com/api/bootstrap-static/", { cache: "no-store" });
   const data = await res.json();
   const now = new Date();
   const passed = new Set<number>();
@@ -42,7 +42,7 @@ async function getGameweekBannerInfo(): Promise<{ gameweek: number; status: "upc
   const settingsRes = await supabase.from("league_settings").select("current_gameweek").maybeSingle();
   const gameweek = settingsRes.data?.current_gameweek ?? 1;
 
-  const bootstrapRes = await fetch("https://fantasy.premierleague.com/api/bootstrap-static/");
+  const bootstrapRes = await fetch("https://fantasy.premierleague.com/api/bootstrap-static/", { cache: "no-store" });
   const bootstrapData = await bootstrapRes.json();
   const event = bootstrapData.events.find((ev: any) => ev.id === gameweek);
   const deadlinePassed = event ? new Date(event.deadline_time) < new Date() : false;
@@ -51,7 +51,7 @@ async function getGameweekBannerInfo(): Promise<{ gameweek: number; status: "upc
     return { gameweek, status: "upcoming" };
   }
 
-  const fixturesRes = await fetch(`https://fantasy.premierleague.com/api/fixtures/?event=${gameweek}`);
+  const fixturesRes = await fetch(`https://fantasy.premierleague.com/api/fixtures/?event=${gameweek}`, { cache: "no-store" });
   const fixturesData = await fixturesRes.json();
   const allFinished = fixturesData.every((f: any) => f.finished_provisional === true);
 
