@@ -43,7 +43,7 @@ export default async function WeeklyUpdatesPage({
         {reports.map((r) => {
           const isActive = r.gameweek === selectedReport.gameweek;
           return (
-            
+            <a
               key={r.gameweek}
               href={`/weekly-updates?gw=${r.gameweek}`}
               style={{
