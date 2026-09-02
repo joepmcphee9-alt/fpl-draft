@@ -74,9 +74,7 @@ export default async function HistoryPage({
         {BOARD_YEARS.map((b) => {
           const isActive = b.year === selectedYear;
           return (
-            
-              key={b.year}
-              href={`/history?year=${encodeURIComponent(b.year)}`}
+            <a key={b.year} href={`/history?year=${encodeURIComponent(b.year)}`}
               style={{
                 padding: "0.4rem 0.9rem",
                 borderRadius: 6,
