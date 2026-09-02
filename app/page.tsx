@@ -10,16 +10,15 @@ const divisionNames: Record<number, string> = {
 
 const POSITION_ORDER = ["GK", "DEF", "MID", "FWD"];
 const POSITION_COLORS: Record<string, string> = {
-  GK: "rgba(241,196,15,0.18)",
-  DEF: "rgba(63,185,80,0.18)",
-  MID: "rgba(88,166,255,0.18)",
-  FWD: "rgba(248,81,73,0.18)",
+  GK: "#f1c40f",
+  DEF: "#3fb950",
+  MID: "#58a6ff",
+  FWD: "#f85149",
 };
 
 type ManagerSquad = {
   name: string;
   byPosition: Record<string, string[]>;
-  totalRows: number;
 };
 
 async function getData() {
@@ -64,69 +63,62 @@ export default async function SquadsPage() {
             byPosition[pos].push(info?.name ?? `id ${fplId}`);
           });
           POSITION_ORDER.forEach((pos) => byPosition[pos].sort());
-          const totalRows = POSITION_ORDER.reduce((sum, pos) => sum + byPosition[pos].length, 0);
-          return { name: e.players?.name ?? "Unknown", byPosition, totalRows };
+          return { name: e.players?.name ?? "Unknown", byPosition };
         });
 
-        const maxRows = Math.max(0, ...managers.map((m) => m.totalRows));
-
-        const cellForManager = (manager: ManagerSquad, rowIndex: number) => {
-          let offset = rowIndex;
-          for (const pos of POSITION_ORDER) {
-            const group = manager.byPosition[pos];
-            if (offset < group.length) return { name: group[offset], color: POSITION_COLORS[pos] };
-            offset -= group.length;
-          }
-          return null;
-        };
-
         return (
-          <section key={div} style={{ marginTop: "2rem", overflowX: "auto" }}>
+          <section key={div} style={{ marginTop: "2rem" }}>
             <h2>{divisionNames[div]}</h2>
             {managers.length === 0 ? (
               <p style={{ opacity: 0.6 }}>No entries loaded yet.</p>
             ) : (
-              <table style={{ borderCollapse: "collapse", marginTop: "0.5rem", minWidth: "100%" }}>
-                <thead>
-                  <tr>
-                    {managers.map((m) => (
-                      <th
-                        key={m.name}
-                        style={{
-                          padding: "0.4rem 0.8rem",
-                          textAlign: "left",
-                          borderBottom: "2px solid #333",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {m.name}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {Array.from({ length: maxRows }).map((_, rowIndex) => (
-                    <tr key={rowIndex}>
-                      {managers.map((m) => {
-                        const cell = cellForManager(m, rowIndex);
-                        return (
-                          <td
-                            key={m.name}
-                            style={{
-                              padding: "0.3rem 0.8rem",
-                              fontSize: "0.85rem",
-                              whiteSpace: "nowrap",
-                              background: cell?.color ?? "transparent",
-                            }}
-                          >
-                            {cell?.name ?? ""}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+                  gap: "1rem",
+                  marginTop: "0.75rem",
+                }}
+              >
+                {managers.map((m) => (
+                  <div
+                    key={m.name}
+                    style={{
+                      border: "1px solid #1c2530",
+                      borderRadius: 8,
+                      padding: "0.75rem",
+                      background: "rgba(255,255,255,0.02)",
+                    }}
+                  >
+                    <p style={{ fontWeight: 600, marginBottom: "0.5rem", borderBottom: "1px solid #1c2530", paddingBottom: "0.4rem" }}>
+                      {m.name}
+                    </p>
+                    {POSITION_ORDER.map((pos) => {
+                      const names = m.byPosition[pos];
+                      if (names.length === 0) return null;
+                      return (
+                        <div key={pos} style={{ marginBottom: "0.5rem" }}>
+                          {names.map((name) => (
+                            <div
+                              key={name}
+                              style={{
+                                fontSize: "0.82rem",
+                                color: POSITION_COLORS[pos],
+                                padding: "0.1rem 0",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
+                              {name}
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
             )}
           </section>
         );
