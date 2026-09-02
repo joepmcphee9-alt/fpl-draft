@@ -1,4 +1,6 @@
-export const dynamic = "force-dynamic";
+"use client";
+
+import { useEffect, useState } from "react";
 
 const BASE_URL = "https://tgrssvplbmndlzyvfiyq.supabase.co/storage/v1/object/public/history";
 
@@ -46,13 +48,17 @@ The 10-man, two division format remained unchanged and in place for four full se
 
 In the summer of 2026, following the death of Andy, the competition's first ever winner, the top division was named after him and will henceforth be known as the 'Andy McPhee League', with Divisions 2 and 3 retaining their names. As well as honouring him by name, the awarding of a 'Green Jacket', Masters style (due to his other love of golf) was announced to also be awarded to the winner of the AML from the 2026/27 campaign onwards.`;
 
-export default async function HistoryPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ year?: string }>;
-}) {
-  const params = await searchParams;
-  const selectedYear = params.year && BOARD_YEARS.some((b) => b.year === params.year) ? params.year : null;
+export default function HistoryPage() {
+  const [selectedYear, setSelectedYear] = useState<string | null>(null);
+  const [galleryIndex, setGalleryIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setGalleryIndex((i) => (i + 1) % GALLERY_IMAGES.length);
+    }, 2500);
+    return () => clearInterval(timer);
+  }, []);
+
   const selectedBoard = BOARD_YEARS.find((b) => b.year === selectedYear);
 
   return (
@@ -74,19 +80,19 @@ export default async function HistoryPage({
         {BOARD_YEARS.map((b) => {
           const isActive = b.year === selectedYear;
           return (
-            <a key={b.year} href={`/history?year=${encodeURIComponent(b.year)}`}
+            <button key={b.year} onClick={() => setSelectedYear(isActive ? null : b.year)}
               style={{
                 padding: "0.4rem 0.9rem",
                 borderRadius: 6,
-                textDecoration: "none",
                 fontSize: "0.9rem",
+                cursor: "pointer",
                 background: isActive ? "#238636" : "rgba(255,255,255,0.05)",
                 color: isActive ? "white" : "#e6edf3",
                 border: isActive ? "none" : "1px solid #333",
               }}
             >
               {b.year}
-            </a>
+            </button>
           );
         })}
       </div>
@@ -105,23 +111,25 @@ export default async function HistoryPage({
       )}
 
       <h2 style={{ marginTop: "3rem" }}>Gallery</h2>
-      <div
-        style={{
-          display: "flex",
-          gap: "0.75rem",
-          overflowX: "auto",
-          paddingBottom: "1rem",
-          marginTop: "1rem",
-        }}
-      >
-        {GALLERY_IMAGES.map((img) => (
-          <img
-            key={img}
-            src={`${BASE_URL}/gallery/${img}`}
-            alt="League memory"
-            style={{ height: 220, borderRadius: 8, flexShrink: 0 }}
-          />
-        ))}
+      <div style={{ position: "relative", width: "100%", maxWidth: 600, marginTop: "1rem" }}>
+        <img
+          src={`${BASE_URL}/gallery/${GALLERY_IMAGES[galleryIndex]}`}
+          alt="League memory"
+          style={{ width: "100%", borderRadius: 8, transition: "opacity 0.4s ease" }}
+        />
+        <div style={{ display: "flex", justifyContent: "center", gap: "0.4rem", marginTop: "0.6rem" }}>
+          {GALLERY_IMAGES.map((_, i) => (
+            <span
+              key={i}
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: i === galleryIndex ? "#e6edf3" : "rgba(255,255,255,0.2)",
+              }}
+            />
+          ))}
+        </div>
       </div>
     </main>
   );
