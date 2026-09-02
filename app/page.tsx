@@ -37,8 +37,7 @@ export default async function StandingsPage() {
 
   return (
     <main>
-      <h1>FPL Draft League</h1>
-      <p style={{ opacity: 0.7 }}>Standings will populate here once scores are synced in.</p>
+      <h1>Squads</h1>
 
       {divisions.map((div) => {
         const rows = entries.filter((e) => e.division === div);
