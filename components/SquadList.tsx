@@ -4,9 +4,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 type PlayerInfo = { name: string; position: string };
+type TransferRow = { window_label: string; summary: string };
 
-// Cached in memory for the page session so we don't refetch the full
-// FPL player list every time a different squad is expanded.
 let fplPlayersCache: Record<number, PlayerInfo> | null = null;
 
 async function getFplPlayerMap(): Promise<Record<number, PlayerInfo>> {
@@ -37,23 +36,29 @@ const POSITION_COLORS: Record<string, string> = {
 
 export default function SquadList({ entryId }: { entryId: string }) {
   const [grouped, setGrouped] = useState<Record<string, string[]> | null>(null);
+  const [transfers, setTransfers] = useState<TransferRow[]>([]);
 
   useEffect(() => {
     const load = async () => {
-      const { data } = await supabase
-        .from("squad_players")
-        .select("fpl_player_id")
-        .eq("entry_id", entryId);
+      const [{ data: squadRows }, { data: transferRows }] = await Promise.all([
+        supabase.from("squad_players").select("fpl_player_id").eq("entry_id", entryId),
+        supabase
+          .from("transfer_history")
+          .select("window_label, summary")
+          .eq("entry_id", entryId)
+          .order("created_at", { ascending: false }),
+      ]);
 
       const infoMap = await getFplPlayerMap();
       const byPosition: Record<string, string[]> = { GK: [], DEF: [], MID: [], FWD: [] };
-      (data ?? []).forEach((row) => {
+      (squadRows ?? []).forEach((row) => {
         const info = infoMap[row.fpl_player_id];
         const pos = info?.position && byPosition[info.position] ? info.position : "FWD";
         byPosition[pos].push(info?.name ?? `Unknown (id ${row.fpl_player_id})`);
       });
       Object.keys(byPosition).forEach((pos) => byPosition[pos].sort());
       setGrouped(byPosition);
+      setTransfers(transferRows ?? []);
     };
     load();
   }, [entryId]);
@@ -68,23 +73,38 @@ export default function SquadList({ entryId }: { entryId: string }) {
   }
 
   return (
-    <div style={{ padding: "0.75rem 0 1rem 1rem", display: "flex", gap: "2rem", flexWrap: "wrap" }}>
-      {POSITION_ORDER.map((pos) => {
-        const names = grouped[pos];
-        if (!names || names.length === 0) return null;
-        return (
-          <div key={pos}>
-            <p style={{ fontSize: "0.75rem", opacity: 0.7, color: POSITION_COLORS[pos], marginBottom: "0.3rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.03em" }}>
-              {POSITION_LABELS[pos]}
+    <div style={{ padding: "0.75rem 0 1rem 1rem" }}>
+      <div style={{ display: "flex", gap: "2rem", flexWrap: "wrap" }}>
+        {POSITION_ORDER.map((pos) => {
+          const names = grouped[pos];
+          if (!names || names.length === 0) return null;
+          return (
+            <div key={pos}>
+              <p style={{ fontSize: "0.75rem", opacity: 0.7, color: POSITION_COLORS[pos], marginBottom: "0.3rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.03em" }}>
+                {POSITION_LABELS[pos]}
+              </p>
+              {names.map((name) => (
+                <div key={name} style={{ fontSize: "0.9rem", color: POSITION_COLORS[pos], padding: "0.1rem 0" }}>
+                  {name}
+                </div>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+
+      {transfers.length > 0 && (
+        <div style={{ marginTop: "1rem" }}>
+          <p style={{ fontSize: "0.75rem", opacity: 0.6, marginBottom: "0.3rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.03em" }}>
+            Transfers
+          </p>
+          {transfers.map((t, i) => (
+            <p key={i} style={{ fontSize: "0.85rem", opacity: 0.75, margin: "0.2rem 0" }}>
+              <strong>{t.window_label}:</strong> {t.summary}
             </p>
-            {names.map((name) => (
-              <div key={name} style={{ fontSize: "0.9rem", color: POSITION_COLORS[pos], padding: "0.1rem 0" }}>
-                {name}
-              </div>
-            ))}
-          </div>
-        );
-      })}
+          ))}
+        </div>
+      )}
     </div>
   );
 }
