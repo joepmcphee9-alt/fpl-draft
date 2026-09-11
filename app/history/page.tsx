@@ -112,11 +112,13 @@ export default function HistoryPage() {
 
       <h2 style={{ marginTop: "3rem" }}>Gallery</h2>
       <div style={{ position: "relative", width: "100%", maxWidth: 600, marginTop: "1rem" }}>
-        <img
-          src={`${BASE_URL}/gallery/${GALLERY_IMAGES[galleryIndex]}`}
-          alt="League memory"
-          style={{ width: "100%", borderRadius: 8, transition: "opacity 0.4s ease" }}
-        />
+        <div style={{ width: "100%", height: 380, borderRadius: 8, background: "rgba(255,255,255,0.03)", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <img
+            src={`${BASE_URL}/gallery/${GALLERY_IMAGES[galleryIndex]}`}
+            alt="League memory"
+            style={{ width: "100%", height: "100%", objectFit: "contain", transition: "opacity 0.4s ease" }}
+          />
+        </div>
         <div style={{ display: "flex", justifyContent: "center", gap: "0.4rem", marginTop: "0.6rem" }}>
           {GALLERY_IMAGES.map((_, i) => (
             <span
