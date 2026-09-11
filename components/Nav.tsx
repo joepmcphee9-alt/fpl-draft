@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 const links = [
-  { href: "/", label: "Squads" },
+  {href: "/squads", label: "Squads" },  
   { href: "/table", label: "League Table" },
   { href: "/fixtures", label: "Fixtures & Results" },
   { href: "/submit", label: "Submit lineup" },
