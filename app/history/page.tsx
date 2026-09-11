@@ -67,7 +67,7 @@ export default function HistoryPage() {
         <img
           src={`${BASE_URL}/hero.jpg`}
           alt="The league"
-          style={{ width: "100%", height: 420, objectFit: "cover", objectPosition: "center 50%", transform: "scale(1.3)" }}
+          style={{ width: "100%", height: 420, objectFit: "cover", objectPosition: "center 75%", transform: "scale(1.3)" }}
         />
       </div>
 
