@@ -79,8 +79,8 @@ export default function HomePage() {
     });
     setFixturesByDivision(byDiv);
 
-    // --- League table snapshot (top 3 per division) ---
-    const bootstrapRes = await fetch("https://fantasy.premierleague.com/api/bootstrap-static/", { cache: "no-store" });
+     // --- League table snapshot (top 3 per division) ---
+    const bootstrapRes = await fetch("/api/fpl-bootstrap");
     const bootstrapData = await bootstrapRes.json();
     const now = new Date();
     const passedGameweeks = new Set<number>();
@@ -88,9 +88,7 @@ export default function HomePage() {
       if (new Date(ev.deadline_time) < now) passedGameweeks.add(ev.id);
     });
 
-    const teamMap: Record<number, string> = {};
-    bootstrapData.teams.forEach((t: any) => (teamMap[t.id] = t.short_name));
-    setTeamNames(teamMap);
+    setTeamNames(bootstrapData.teamNames);
 
     const scoreByEntryGw: Record<string, number> = {};
     (allScores ?? []).forEach((s: any) => (scoreByEntryGw[`${s.entry_id}:${s.gameweek}`] = s.points));
@@ -130,7 +128,7 @@ export default function HomePage() {
     setTableSnapshots(snapshots);
 
     // --- Real Premier League fixtures for this gameweek ---
-    const plRes = await fetch(`https://fantasy.premierleague.com/api/fixtures/?event=${gw}`, { cache: "no-store" });
+    const plRes = await fetch(`/api/fpl-fixtures-raw/${gw}`);
     const plData = await plRes.json();
     setPlFixtures(plData);
 
