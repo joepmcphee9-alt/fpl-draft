@@ -63,11 +63,13 @@ export default function HistoryPage() {
 
   return (
     <main>
-      <img
-        src={`${BASE_URL}/hero.jpg`}
-        alt="The league"
-        style={{ width: "100%", maxHeight: 420, objectFit: "cover", borderRadius: 8, marginBottom: "1.5rem" }}
-      />
+      <div style={{ width: "100%", maxHeight: 420, borderRadius: 8, marginBottom: "1.5rem", overflow: "hidden" }}>
+        <img
+          src={`${BASE_URL}/hero.jpg`}
+          alt="The league"
+          style={{ width: "100%", height: 420, objectFit: "cover", objectPosition: "center 30%", transform: "scale(1.3)" }}
+        />
+      </div>
 
       <h1>Our History</h1>
 
