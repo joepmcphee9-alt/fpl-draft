@@ -10,7 +10,7 @@ const links = [
   { href: "/matchup", label: "My matchup" },
   { href: "/weekly-updates", label: "Weekly Updates" },
   { href: "/mom", label: "Manager of the Month" },
-  { href: "/michu-cup", label: "Michu Cup" },
+  { href: "/michu-cup/fixtures", label: "Michu Cup" },
   { href: "/history", label: "History" },  
   { href: "/admin", label: "Admin" },
 ];
