@@ -1,3 +1,5 @@
+import HomeButton from "@/components/HomeButton";
+
 import AuthStatus from "@/components/AuthStatus";
 
 export const metadata = {
@@ -25,7 +27,8 @@ export default function RootLayout({
         }}
       >
         <div style={{ maxWidth: 720, margin: "0 auto" }}>
-          <Nav />
+         <Nav />
+          <HomeButton />
           <AuthStatus />
           {children}
         </div>
