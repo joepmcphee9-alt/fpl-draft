@@ -1,22 +1,27 @@
+import { fplJson, fplError } from "@/lib/fpl";
+
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const res = await fetch("https://fantasy.premierleague.com/api/bootstrap-static/");
-  const data = await res.json();
+  try {
+    const data = await fplJson("bootstrap-static/");
 
-  const positionNames: Record<number, string> = {
-    1: "GK",
-    2: "DEF",
-    3: "MID",
-    4: "FWD",
-  };
+    const positionNames: Record<number, string> = {
+      1: "GK",
+      2: "DEF",
+      3: "MID",
+      4: "FWD",
+    };
 
-  const players = data.elements.map((el: any) => ({
-    id: el.id,
-    name: el.web_name,
-    position: positionNames[el.element_type] ?? "UNK",
-    team: el.team,
-  }));
+    const players = data.elements.map((el: any) => ({
+      id: el.id,
+      name: el.web_name,
+      position: positionNames[el.element_type] ?? "UNK",
+      team: el.team,
+    }));
 
-  return Response.json(players);
+    return Response.json(players);
+  } catch (err) {
+    return fplError(err);
+  }
 }
