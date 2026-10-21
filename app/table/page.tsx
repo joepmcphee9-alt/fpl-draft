@@ -1,24 +1,17 @@
 import { supabase } from "@/lib/supabaseClient";
+import { fplJson } from "@/lib/fpl";
+import { DIVISION_NAMES as divisionNames, bandFor, computeStandings, loadLeagueData } from "@/lib/leagueTable";
 
-const divisionNames: Record<number, string> = {
-  1: "The Andy McPhee League",
-  2: "Division 2",
-  3: "Division 3",
+const BAND_BACKGROUNDS = {
+  gold: "rgba(212,175,55,0.25)",
+  green: "rgba(63,185,80,0.15)",
+  red: "rgba(248,81,73,0.15)",
 };
 
-// Colour bands, confirmed per division for this season
+// Colour bands, confirmed per division for this season (set in lib/leagueTable.ts)
 function bandStyle(division: number, position: number): React.CSSProperties {
-  const bands: Record<number, { gold: number; green: [number, number]; red: [number, number] | null }> = {
-    1: { gold: 1, green: [2, 3], red: [7, 10] },
-    2: { gold: 1, green: [2, 4], red: [6, 9] },
-    3: { gold: 1, green: [2, 5], red: null },
-  };
-  const b = bands[division];
-  if (!b) return {};
-  if (position === b.gold) return { background: "rgba(212,175,55,0.25)" };
-  if (position >= b.green[0] && position <= b.green[1]) return { background: "rgba(63,185,80,0.15)" };
-  if (b.red && position >= b.red[0] && position <= b.red[1]) return { background: "rgba(248,81,73,0.15)" };
-  return {};
+  const band = bandFor(division, position);
+  return band ? { background: BAND_BACKGROUNDS[band] } : {};
 }
 
 // A gameweek only counts toward the table once its deadline has actually
@@ -26,8 +19,7 @@ function bandStyle(division: number, position: number): React.CSSProperties {
 // 0-0 draws before a single match has kicked off (Luke's scoring script
 // writes a valid 0 total for every lineup on every run, even pre-kickoff).
 async function getPassedDeadlineGameweeks(): Promise<Set<number>> {
-  const res = await fetch("https://fantasy.premierleague.com/api/bootstrap-static/", { cache: "no-store" });
-  const data = await res.json();
+  const data = await fplJson("bootstrap-static/");
   const now = new Date();
   const passed = new Set<number>();
   data.events.forEach((ev: any) => {
@@ -42,8 +34,7 @@ async function getGameweekBannerInfo(): Promise<{ gameweek: number; status: "upc
   const settingsRes = await supabase.from("league_settings").select("current_gameweek").maybeSingle();
   const gameweek = settingsRes.data?.current_gameweek ?? 1;
 
-  const bootstrapRes = await fetch("https://fantasy.premierleague.com/api/bootstrap-static/", { cache: "no-store" });
-  const bootstrapData = await bootstrapRes.json();
+  const bootstrapData = await fplJson("bootstrap-static/");
   const event = bootstrapData.events.find((ev: any) => ev.id === gameweek);
   const deadlinePassed = event ? new Date(event.deadline_time) < new Date() : false;
 
@@ -51,96 +42,22 @@ async function getGameweekBannerInfo(): Promise<{ gameweek: number; status: "upc
     return { gameweek, status: "upcoming" };
   }
 
-  const fixturesRes = await fetch(`https://fantasy.premierleague.com/api/fixtures/?event=${gameweek}`, { cache: "no-store" });
-  const fixturesData = await fixturesRes.json();
+  const fixturesData = await fplJson(`fixtures/?event=${gameweek}`);
   const allFinished = fixturesData.every((f: any) => f.finished_provisional === true);
 
   return { gameweek, status: allFinished ? "complete" : "live" };
 }
 
-type Row = {
-  entryId: string;
-  managerName: string;
-  played: number;
-  w: number;
-  d: number;
-  l: number;
-  ptsFor: number;
-  ptsAgainst: number;
-  penalties: number;
-};
+export const dynamic = "force-dynamic";
 
 export default async function TablePage() {
-  const [{ data: entries }, { data: fixtures }, { data: scores }, { data: penalties }, passedGameweeks, bannerInfo] =
-    await Promise.all([
-      supabase.from("entries").select("id, division, players(name, email)"),
-      supabase.from("fixtures").select("division, gameweek, home_entry_id, away_entry_id, is_bye").eq("is_bye", false),
-      supabase.from("entry_scores").select("entry_id, gameweek, points"),
-      supabase.from("penalties").select("entry_id, points"),
-      getPassedDeadlineGameweeks(),
-      getGameweekBannerInfo(),
-    ]);
+  const [leagueData, passedGameweeks, bannerInfo] = await Promise.all([
+    loadLeagueData(),
+    getPassedDeadlineGameweeks(),
+    getGameweekBannerInfo(),
+  ]);
 
-  const scoreByEntryGw: Record<string, number> = {};
-  (scores ?? []).forEach((s) => {
-    scoreByEntryGw[`${s.entry_id}:${s.gameweek}`] = s.points;
-  });
-
-  const penaltyByEntry: Record<string, number> = {};
-  (penalties ?? []).forEach((p) => {
-    penaltyByEntry[p.entry_id] = (penaltyByEntry[p.entry_id] || 0) + p.points;
-  });
-
-  // Only real, playing entries (excludes Andy's memorial entry — no email)
-  const playingEntries = (entries ?? []).filter((e: any) => e.players?.email);
-
-  const rowsByEntry: Record<string, Row> = {};
-  playingEntries.forEach((e: any) => {
-    rowsByEntry[e.id] = {
-      entryId: e.id,
-      managerName: e.players?.name ?? "Unknown",
-      played: 0,
-      w: 0,
-      d: 0,
-      l: 0,
-      ptsFor: 0,
-      ptsAgainst: 0,
-      penalties: penaltyByEntry[e.id] || 0,
-    };
-  });
-
-  (fixtures ?? []).forEach((f) => {
-    if (!f.away_entry_id) return;
-    if (!passedGameweeks.has(f.gameweek)) return; // deadline hasn't passed — not live/played yet
-
-    const homeKey = `${f.home_entry_id}:${f.gameweek}`;
-    const awayKey = `${f.away_entry_id}:${f.gameweek}`;
-    const homeScore = scoreByEntryGw[homeKey];
-    const awayScore = scoreByEntryGw[awayKey];
-    if (homeScore == null || awayScore == null) return;
-
-    const homeRow = rowsByEntry[f.home_entry_id];
-    const awayRow = rowsByEntry[f.away_entry_id];
-    if (!homeRow || !awayRow) return;
-
-    homeRow.played++;
-    awayRow.played++;
-    homeRow.ptsFor += homeScore;
-    homeRow.ptsAgainst += awayScore;
-    awayRow.ptsFor += awayScore;
-    awayRow.ptsAgainst += homeScore;
-
-    if (homeScore > awayScore) {
-      homeRow.w++;
-      awayRow.l++;
-    } else if (homeScore < awayScore) {
-      awayRow.w++;
-      homeRow.l++;
-    } else {
-      homeRow.d++;
-      awayRow.d++;
-    }
-  });
+  const standings = computeStandings(leagueData, (gw) => passedGameweeks.has(gw));
 
   const divisions = [1, 2, 3];
 
@@ -162,20 +79,7 @@ export default async function TablePage() {
       </p>
 
       {divisions.map((div) => {
-        const divEntryIds = new Set(playingEntries.filter((e: any) => e.division === div).map((e: any) => e.id));
-        const rows = Object.values(rowsByEntry).filter((r) => divEntryIds.has(r.entryId));
-
-        const withStandings = rows.map((r) => ({
-          ...r,
-          leaguePts: r.w * 3 + r.d * 1 + r.penalties,
-          ptsDiff: r.ptsFor - r.ptsAgainst,
-        }));
-
-        withStandings.sort((a, b) => {
-          if (b.leaguePts !== a.leaguePts) return b.leaguePts - a.leaguePts;
-          if (b.ptsFor !== a.ptsFor) return b.ptsFor - a.ptsFor;
-          return b.ptsDiff - a.ptsDiff;
-        });
+        const withStandings = standings[div] ?? [];
 
         return (
           <section key={div} style={{ marginTop: "2rem" }}>
