@@ -162,8 +162,8 @@ export async function buildGwStats(gameweek: number): Promise<string> {
     const captainId = captainDidNotPlay ? lu.vice_captain_id : lu.captain_id;
     const captain = xi.find((p) => p.id === captainId) ?? null;
 
-    const played = xi.filter((p) => p.live.minutes > 0);
-    const bestPlayer = [...xi].sort((a, b) => b.live.points - a.live.points)[0] ?? null;
+    // Only players picked to start could have worn the armband
+    const played = (lu.starting_xi ?? []).map((id: number) => player(id)!).filter((p: PlayerLine) => p.live.minutes > 0);    const bestPlayer = [...xi].sort((a, b) => b.live.points - a.live.points)[0] ?? null;
     const bestCaptainOption = [...played].sort((a, b) => b.live.points - a.live.points)[0] ?? null;
 
     teams[lu.entry_id] = {
