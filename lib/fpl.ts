@@ -39,3 +39,14 @@ export function fplError(err: unknown) {
   console.error(message);
   return Response.json({ error: message }, { status: 502 });
 }
+// When each gameweek's first match kicks off. This is the league's deadline
+// (FPL's own deadline is earlier). Returns { gameweek: ISO time }.
+export async function firstKickoffs(): Promise<Record<number, string>> {
+  const fixtures = await fplJson("fixtures/");
+  const first: Record<number, string> = {};
+  fixtures.forEach((f: any) => {
+    if (!f.event || !f.kickoff_time) return;
+    if (!first[f.event] || new Date(f.kickoff_time) < new Date(first[f.event])) first[f.event] = f.kickoff_time;
+  });
+  return first;
+}

@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
-import { fplJson } from "@/lib/fpl";
+import { firstKickoffs, fplJson } from "@/lib/fpl";
 import { DIVISIONS, DIVISION_NAMES, computeStandings, loadLeagueData } from "@/lib/leagueTable";
 import { gameweekMonthsFromEvents, getMonthTotals } from "@/lib/mom";
 import { assignOutcomes, buildStandings, getCupFixtures } from "@/lib/michuCup";
@@ -382,7 +382,9 @@ export async function buildGwStats(gameweek: number): Promise<string> {
   // ---- What's next ----
   const next = bootstrap.events.find((e: any) => e.id === gameweek + 1);
   if (next) {
-    const nextDeadline = new Date(next.deadline_time);
+    // League deadline = first kick-off of the gameweek (FPL's deadline is earlier)
+    const kickoffs = await firstKickoffs();
+    const nextDeadline = new Date(kickoffs[gameweek + 1] ?? next.deadline_time);
     const gapDays = event ? (nextDeadline.getTime() - new Date(event.deadline_time).getTime()) / 86400000 : 0;
     say("=== NEXT UP ===");
     say(

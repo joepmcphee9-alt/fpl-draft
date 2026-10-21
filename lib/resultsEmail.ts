@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
-import { fplJson } from "@/lib/fpl";
+import { firstKickoffs, fplJson } from "@/lib/fpl";
 import { DIVISIONS, DIVISION_NAMES, LeagueRow, bandFor, computeStandings, loadLeagueData } from "@/lib/leagueTable";
 import { gameweekMonthsFromEvents, getMonthTotals } from "@/lib/mom";
 import { getCupFixtures } from "@/lib/michuCup";
@@ -11,11 +11,12 @@ export type ResultsEmail = { gameweek: number; subject: string; html: string; te
 // Builds the end-of-gameweek results email. The site and the email both use
 // this, so the email always matches what the site shows.
 export async function buildResultsEmail(gameweek: number): Promise<ResultsEmail> {
-  const [bootstrap, league, cup, settingsRes] = await Promise.all([
+  const [bootstrap, league, cup, settingsRes, kickoffs] = await Promise.all([
     fplJson("bootstrap-static/"),
     loadLeagueData(),
     getCupFixtures(),
     supabase.from("league_settings").select("current_gameweek, deadline").maybeSingle(),
+    firstKickoffs(),
   ]);
 
   const nameOf: Record<string, string> = {};
@@ -82,13 +83,12 @@ export async function buildResultsEmail(gameweek: number): Promise<ResultsEmail>
   });
 
   // ---- Next deadline ----
-  // Use the league's own deadline if the next gameweek has already been set
-  // on the admin page, otherwise FPL's deadline for it.
+  // The league's deadline is the first kick-off of the gameweek. Use the one
+  // set on the admin page if the next gameweek is already set up there.
   const nextGw = gameweek + 1;
-  const nextEvent = bootstrap.events.find((ev: any) => ev.id === nextGw);
   const settings = settingsRes.data;
   const deadlineIso =
-    settings?.current_gameweek === nextGw && settings?.deadline ? settings.deadline : nextEvent?.deadline_time ?? null;
+    settings?.current_gameweek === nextGw && settings?.deadline ? settings.deadline : kickoffs[nextGw] ?? null;
   const deadlineText = deadlineIso
     ? new Date(deadlineIso)
         .toLocaleString("en-GB", {

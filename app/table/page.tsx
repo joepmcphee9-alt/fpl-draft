@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
-import { fplJson } from "@/lib/fpl";
+import { firstKickoffs, fplJson } from "@/lib/fpl";
 import { DIVISION_NAMES as divisionNames, bandFor, computeStandings, loadLeagueData } from "@/lib/leagueTable";
 
 const BAND_BACKGROUNDS = {
@@ -14,31 +14,29 @@ function bandStyle(division: number, position: number): React.CSSProperties {
   return band ? { background: BAND_BACKGROUNDS[band] } : {};
 }
 
-// A gameweek only counts toward the table once its deadline has actually
-// passed — this stops a freshly-flipped gameweek showing as a wave of false
-// 0-0 draws before a single match has kicked off (Luke's scoring script
-// writes a valid 0 total for every lineup on every run, even pre-kickoff).
-async function getPassedDeadlineGameweeks(): Promise<Set<number>> {
-  const data = await fplJson("bootstrap-static/");
+// A gameweek only counts toward the table once its first match has kicked
+// off (that's the league's deadline) — this stops a freshly-flipped gameweek
+// showing as a wave of false 0-0 draws before a ball has been kicked (the
+// scoring script writes a valid 0 total for every lineup on every run).
+async function getStartedGameweeks(kickoffs: Record<number, string>): Promise<Set<number>> {
   const now = new Date();
-  const passed = new Set<number>();
-  data.events.forEach((ev: any) => {
-    if (new Date(ev.deadline_time) < now) passed.add(ev.id);
+  const started = new Set<number>();
+  Object.entries(kickoffs).forEach(([gw, kickoff]) => {
+    if (new Date(kickoff) < now) started.add(Number(gw));
   });
-  return passed;
+  return started;
 }
 
 // Works out whether the current gameweek hasn't started, is live, or is
 // fully complete — for the status banner at the top of the table.
-async function getGameweekBannerInfo(): Promise<{ gameweek: number; status: "upcoming" | "live" | "complete" }> {
+async function getGameweekBannerInfo(
+  kickoffs: Record<number, string>
+): Promise<{ gameweek: number; status: "upcoming" | "live" | "complete" }> {
   const settingsRes = await supabase.from("league_settings").select("current_gameweek").maybeSingle();
   const gameweek = settingsRes.data?.current_gameweek ?? 1;
 
-  const bootstrapData = await fplJson("bootstrap-static/");
-  const event = bootstrapData.events.find((ev: any) => ev.id === gameweek);
-  const deadlinePassed = event ? new Date(event.deadline_time) < new Date() : false;
-
-  if (!deadlinePassed) {
+  const started = kickoffs[gameweek] ? new Date(kickoffs[gameweek]) < new Date() : false;
+  if (!started) {
     return { gameweek, status: "upcoming" };
   }
 
@@ -48,16 +46,31 @@ async function getGameweekBannerInfo(): Promise<{ gameweek: number; status: "upc
   return { gameweek, status: allFinished ? "complete" : "live" };
 }
 
+function Movement({ moved }: { moved: number }) {
+  if (moved > 0) return <span style={{ color: "#3fb950", fontSize: "0.8rem" }}>▲{moved}</span>;
+  if (moved < 0) return <span style={{ color: "#f85149", fontSize: "0.8rem" }}>▼{-moved}</span>;
+  return <span style={{ color: "#8b949e", fontSize: "0.8rem" }}>–</span>;
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function TablePage() {
-  const [leagueData, passedGameweeks, bannerInfo] = await Promise.all([
+  const kickoffs = await firstKickoffs();
+  const [leagueData, startedGameweeks, bannerInfo] = await Promise.all([
     loadLeagueData(),
-    getPassedDeadlineGameweeks(),
-    getGameweekBannerInfo(),
+    getStartedGameweeks(kickoffs),
+    getGameweekBannerInfo(kickoffs),
   ]);
 
-  const standings = computeStandings(leagueData, (gw) => passedGameweeks.has(gw));
+  const standings = computeStandings(leagueData, (gw) => startedGameweeks.has(gw));
+
+  // Places moved since the previous gameweek — only shown when no gameweek is
+  // live, so the arrows always describe a finished gameweek.
+  const latestGw = startedGameweeks.size ? Math.max(...Array.from(startedGameweeks)) : 0;
+  const showMovement = bannerInfo.status !== "live" && latestGw > 1;
+  const previous = showMovement
+    ? computeStandings(leagueData, (gw) => startedGameweeks.has(gw) && gw < latestGw)
+    : null;
 
   const divisions = [1, 2, 3];
 
@@ -77,9 +90,16 @@ export default async function TablePage() {
         <span style={{ width: 8, height: 8, borderRadius: "50%", background: bannerColor }} />
         {bannerText}
       </p>
+      {showMovement && (
+        <p style={{ opacity: 0.6, fontSize: "0.85rem", margin: "0 0 1rem" }}>
+          ▲▼ show places moved in Gameweek {latestGw}.
+        </p>
+      )}
 
       {divisions.map((div) => {
         const withStandings = standings[div] ?? [];
+        const prevPos: Record<string, number> = {};
+        (previous?.[div] ?? []).forEach((r, i) => (prevPos[r.entryId] = i + 1));
 
         return (
           <section key={div} style={{ marginTop: "2rem" }}>
@@ -101,7 +121,14 @@ export default async function TablePage() {
               <tbody>
                 {withStandings.map((r, i) => (
                   <tr key={r.entryId} style={{ borderBottom: "1px solid #1c2530", ...bandStyle(div, i + 1) }}>
-                    <td style={{ padding: "0.4rem 0.5rem" }}>{i + 1}</td>
+                    <td style={{ padding: "0.4rem 0.5rem", whiteSpace: "nowrap" }}>
+                      {i + 1}
+                      {showMovement && prevPos[r.entryId] != null && (
+                        <span style={{ marginLeft: "0.4rem" }}>
+                          <Movement moved={prevPos[r.entryId] - (i + 1)} />
+                        </span>
+                      )}
+                    </td>
                     <td style={{ padding: "0.4rem 0.5rem" }}>{r.managerName}</td>
                     <td style={{ padding: "0.4rem 0.5rem" }}>{r.played}</td>
                     <td style={{ padding: "0.4rem 0.5rem" }}>{r.w}</td>
