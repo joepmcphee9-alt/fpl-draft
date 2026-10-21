@@ -181,7 +181,15 @@ export default function MatchupView({ fixtureId }: { fixtureId: string }) {
       return sub ? sub.in : id;
     });
 
-    const effectiveCaptainId = side.captainId;
+       // Same rule as the scoring script: if the captain's match is over and he
+    // played 0 minutes, the vice-captain gets the armband.
+    const captainTeam = side.captainId != null ? playerMap[side.captainId]?.team : undefined;
+    const captainDidNotPlay =
+      side.captainId != null &&
+      livePoints[side.captainId]?.minutes === 0 &&
+      captainTeam != null &&
+      fixtureStatus[captainTeam] === "finished";
+    const effectiveCaptainId = captainDidNotPlay ? side.viceCaptainId : side.captainId;
 
     const anyBlank = effectiveXi.some((id) => {
       const info = playerMap[id];
