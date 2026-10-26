@@ -23,7 +23,7 @@ export type CupFixture = {
   status: "final" | "live" | "upcoming";
 };
 
-export type Penalty = { entryId: string; gameweek: number; points: number };
+export type Penalty = { entryId: string; gameweek: number; points: number; reason?: string | null };
 
 export type StandingRow = {
   entryId: string;
@@ -80,7 +80,7 @@ export async function getCupFixtures(): Promise<{
     const maxGw = Math.max(...gws);
     const [scoresRes, penaltiesRes] = await Promise.all([
       supabase.from("entry_scores").select("entry_id, gameweek, points").gte("gameweek", minGw).lte("gameweek", maxGw),
-      supabase.from("penalties").select("entry_id, gameweek, points").gte("gameweek", minGw).lte("gameweek", maxGw),
+      supabase.from("penalties").select("entry_id, gameweek, points, reason").gte("gameweek", minGw).lte("gameweek", maxGw),
     ]);
     if (scoresRes.error) console.error(scoresRes.error);
     if (penaltiesRes.error) console.error(penaltiesRes.error);
@@ -91,6 +91,7 @@ export async function getCupFixtures(): Promise<{
       entryId: p.entry_id,
       gameweek: p.gameweek,
       points: p.points,
+      reason: p.reason,
     }));
   }
 
@@ -210,4 +211,20 @@ export function assignOutcomes(standings: Record<number, StandingRow[]>): {
   });
 
   return { outcomes, thirds };
+}
+// The penalties that count in each group's table: only from gameweeks where
+// that manager had a cup match (not their bye week).
+export function cupPenaltiesByGroup(fixtures: CupFixture[], penalties: Penalty[]): Record<number, (Penalty & { name: string })[]> {
+  const matchWeek: Record<string, { group: number; name: string }> = {};
+  fixtures.forEach((f) => {
+    if (!f.away) return;
+    matchWeek[`${f.home.entryId}:${f.gameweek}`] = { group: f.group, name: f.home.name };
+    matchWeek[`${f.away.entryId}:${f.gameweek}`] = { group: f.group, name: f.away.name };
+  });
+  const out: Record<number, (Penalty & { name: string })[]> = {};
+  penalties.forEach((p) => {
+    const m = matchWeek[`${p.entryId}:${p.gameweek}`];
+    if (m) (out[m.group] ??= []).push({ ...p, name: m.name });
+  });
+  return out;
 }

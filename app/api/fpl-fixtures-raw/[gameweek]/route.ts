@@ -1,4 +1,4 @@
-import { fplJson, fplError } from "@/lib/fpl";
+import { cachedFpl, fplError, fplJson } from "@/lib/fpl";
 
 export const dynamic = "force-dynamic";
 
@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const { gameweek } = await params;
-    const data = await fplJson(`fixtures/?event=${gameweek}`);
+    const data = await cachedFpl(`fixtures-raw-${gameweek}`, 60, () => fplJson(`fixtures/?event=${gameweek}`));
     return Response.json(data);
   } catch (err) {
     return fplError(err);

@@ -6,8 +6,10 @@ import {
   StandingRow,
   assignOutcomes,
   buildStandings,
+  cupPenaltiesByGroup,
   getCupFixtures,
 } from "@/lib/michuCup";
+import { penaltyMarkers } from "@/lib/penaltyNotes";
 
 export const revalidate = 60;
 
@@ -26,11 +28,13 @@ function StandingsTable({
   outcomes,
   showPenalty,
   showGroup = false,
+  markers = {},
 }: {
   rows: StandingRow[];
   outcomes: Record<string, Outcome>;
   showPenalty: boolean;
   showGroup?: boolean;
+  markers?: Record<string, string>;
 }) {
   return (
     <div style={{ overflowX: "auto" }}>
@@ -61,7 +65,7 @@ function StandingsTable({
                 >
                   {i + 1}
                 </td>
-                <td style={nameCell}>{r.name}</td>
+                <td style={nameCell}>{r.name}{markers[r.entryId] ?? ""}</td>
                 {showGroup && <td style={nameCell}>{r.group}</td>}
                 <td style={cell}>{r.played}</td>
                 <td style={cell}>{r.won}</td>
@@ -99,6 +103,7 @@ function Legend() {
 export default async function MichuCupTablePage() {
   const { fixtures, penalties } = await getCupFixtures();
   const standings = buildStandings(fixtures, penalties);
+  const penaltiesByGroup = cupPenaltiesByGroup(fixtures, penalties);
   const { outcomes, thirds } = assignOutcomes(standings);
   const groups = Object.keys(standings).map(Number).sort((a, b) => a - b);
   const showPenalty = Object.values(standings).some((rows) => rows.some((r) => r.penalty !== 0));
@@ -131,7 +136,11 @@ export default async function MichuCupTablePage() {
           marginTop: "1.5rem",
         }}
       >
-        {groups.map((g) => (
+        {groups.map((g) => {
+          const { markers, notes } = penaltyMarkers(
+            penaltiesByGroup[g] ?? []
+          );
+          return (
           <section key={g}>
             <h2 style={{ marginBottom: "0.25rem" }}>Group {g}</h2>
             <p style={{ margin: "0 0 0.5rem", fontSize: "0.85rem", opacity: 0.6 }}>
@@ -139,9 +148,17 @@ export default async function MichuCupTablePage() {
                 ? `Honorary seed: ${HONORARY_SEEDS[g]} · top two through, 3rd and 4th to the secondary competition`
                 : "Top two through · 3rd into the best-thirds race · 4th to the secondary competition · 5th out"}
             </p>
-            <StandingsTable rows={standings[g]} outcomes={outcomes} showPenalty={showPenalty} />
+            <StandingsTable rows={standings[g]} outcomes={outcomes} showPenalty={showPenalty} markers={markers} />
+            {notes.length > 0 && (
+              <div style={{ marginTop: "0.5rem", fontSize: "0.85rem", opacity: 0.75 }}>
+                {notes.map((n) => (
+                  <p key={n} style={{ margin: "0.15rem 0" }}>{n}</p>
+                ))}
+              </div>
+            )}
           </section>
-        ))}
+          );
+        })}
       </div>
 
       {thirds.length > 0 && (

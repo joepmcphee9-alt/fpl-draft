@@ -1,4 +1,4 @@
-import { fplJson, fplError } from "@/lib/fpl";
+import { cachedFpl, fplError, fplJson } from "@/lib/fpl";
 
 export const dynamic = "force-dynamic";
 
@@ -8,16 +8,19 @@ export async function GET(
 ) {
   try {
     const { gameweek } = await params;
-    const fixtures = await fplJson(`fixtures/?event=${gameweek}`);
+    const statusByTeam = await cachedFpl(`fixture-status-${gameweek}`, 60, async () => {
+      const fixtures = await fplJson(`fixtures/?event=${gameweek}`);
 
-    // Map each team to their match status this gameweek
-    const statusByTeam: Record<number, "not_started" | "live" | "finished"> = {};
-    fixtures.forEach((f: any) => {
-      let status: "not_started" | "live" | "finished" = "not_started";
-      if (f.finished_provisional) status = "finished";
-      else if (f.started) status = "live";
-      statusByTeam[f.team_h] = status;
-      statusByTeam[f.team_a] = status;
+      // Map each team to their match status this gameweek
+      const status: Record<number, "not_started" | "live" | "finished"> = {};
+      fixtures.forEach((f: any) => {
+        let s: "not_started" | "live" | "finished" = "not_started";
+        if (f.finished_provisional) s = "finished";
+        else if (f.started) s = "live";
+        status[f.team_h] = s;
+        status[f.team_a] = s;
+      });
+      return status;
     });
 
     return Response.json(statusByTeam);

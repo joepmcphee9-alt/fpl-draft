@@ -1,3 +1,5 @@
+import { unstable_cache } from "next/cache";
+
 // One place for every call the site makes to the FPL API.
 // FPL refuses some requests that don't look like they come from a browser,
 // so we send browser-like headers, retry once, and fail with a clear message
@@ -16,7 +18,9 @@ export async function fplJson(path: string): Promise<any> {
   let lastError = "";
   for (let attempt = 1; attempt <= 2; attempt++) {
     try {
-      const res = await fetch(FPL_BASE + path, { headers: HEADERS, cache: "no-store" });
+      // No cache option here: the API routes decide how long to keep results
+      // (see their `revalidate`), and the other pages are always fresh anyway.
+      const res = await fetch(FPL_BASE + path, { headers: HEADERS });
       const text = await res.text();
       if (!res.ok) {
         lastError = `FPL returned ${res.status} for ${path}: ${text.slice(0, 200)}`;
@@ -49,4 +53,12 @@ export async function firstKickoffs(): Promise<Record<number, string>> {
     if (!first[f.event] || new Date(f.kickoff_time) < new Date(first[f.event])) first[f.event] = f.kickoff_time;
   });
   return first;
+}
+
+// Keeps a copy of an FPL result on Vercel for `seconds`, so FPL is asked at
+// most that often however many people are on the site. When the copy is old,
+// visitors still get it straight away while a fresh one is fetched; if FPL
+// refuses that refresh, the old copy stays in place instead of an error.
+export function cachedFpl<T>(key: string, seconds: number, load: () => Promise<T>): Promise<T> {
+  return unstable_cache(load, ["fpl", key], { revalidate: seconds })();
 }

@@ -30,7 +30,7 @@ export type LeagueData = {
   entries: LeagueEntry[]; // playing entries only (Andy's memorial entry has no email)
   fixtures: { division: number; gameweek: number; home_entry_id: string; away_entry_id: string | null; is_bye: boolean }[];
   scores: Record<string, number>; // "entryId:gameweek" -> points
-  penalties: { entry_id: string; gameweek: number; points: number }[];
+  penalties: { entry_id: string; gameweek: number; points: number; reason?: string | null }[];
 };
 
 export type LeagueRow = {
@@ -74,7 +74,7 @@ export async function loadLeagueData(): Promise<LeagueData> {
     supabase.from("entries").select("id, division, players(name, email)"),
     supabase.from("fixtures").select("division, gameweek, home_entry_id, away_entry_id, is_bye").limit(5000),
     fetchAllScores(),
-    supabase.from("penalties").select("entry_id, gameweek, points"),
+    supabase.from("penalties").select("entry_id, gameweek, points, reason"),
   ]);
 
   const scoreMap: Record<string, number> = {};

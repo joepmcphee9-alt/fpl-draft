@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
 import { firstKickoffs, fplJson } from "@/lib/fpl";
 import { DIVISION_NAMES as divisionNames, bandFor, computeStandings, loadLeagueData } from "@/lib/leagueTable";
+import { penaltyMarkers } from "@/lib/penaltyNotes";
 
 const BAND_BACKGROUNDS = {
   gold: "rgba(212,175,55,0.25)",
@@ -98,6 +99,13 @@ export default async function TablePage() {
 
       {divisions.map((div) => {
         const withStandings = standings[div] ?? [];
+        const divNames: Record<string, string> = {};
+        leagueData.entries.filter((e) => e.division === div).forEach((e) => (divNames[e.id] = e.name));
+        const { markers, notes } = penaltyMarkers(
+          leagueData.penalties
+            .filter((p) => divNames[p.entry_id] && startedGameweeks.has(p.gameweek))
+            .map((p) => ({ entryId: p.entry_id, name: divNames[p.entry_id], gameweek: p.gameweek, points: p.points, reason: p.reason }))
+        );
         const prevPos: Record<string, number> = {};
         (previous?.[div] ?? []).forEach((r, i) => (prevPos[r.entryId] = i + 1));
 
@@ -129,7 +137,7 @@ export default async function TablePage() {
                         </span>
                       )}
                     </td>
-                    <td style={{ padding: "0.4rem 0.5rem" }}>{r.managerName}</td>
+                    <td style={{ padding: "0.4rem 0.5rem" }}>{r.managerName}{markers[r.entryId] ?? ""}</td>
                     <td style={{ padding: "0.4rem 0.5rem" }}>{r.played}</td>
                     <td style={{ padding: "0.4rem 0.5rem" }}>{r.w}</td>
                     <td style={{ padding: "0.4rem 0.5rem" }}>{r.d}</td>
@@ -141,6 +149,13 @@ export default async function TablePage() {
                 ))}
               </tbody>
             </table>
+            {notes.length > 0 && (
+              <div style={{ marginTop: "0.5rem", fontSize: "0.85rem", opacity: 0.75 }}>
+                {notes.map((n) => (
+                  <p key={n} style={{ margin: "0.15rem 0" }}>{n}</p>
+                ))}
+              </div>
+            )}
           </section>
         );
       })}
